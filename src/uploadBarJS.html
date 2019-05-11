@@ -1,0 +1,77 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+  /**
+   * Run initializations on sidebar load.
+   */
+  $(function() {
+    // Assign handler functions to sidebar elements here, if needed.
+    $('#sidebar-pull-button').click(onClick);
+
+    // Call the server here to retrieve any information needed to build
+    // the dialog, if necessary.
+  });
+
+  /**
+   * Calls the server to retrieve information from the sheet.
+   * Gets the value in the active cell, which is then placed in the
+   * sidebar text field.
+   */
+  function onClick() {
+    this.disabled = true;
+
+    /**
+     * Return a list of book volumes matching a give query string
+     * @see https://developers.google.com/books/docs/v1/reference/volumes/list 
+     */
+   function match(str, opts, callback){
+    var volume_name = str;
+    var {version, author, tag} = ops;
+    var cbFunction = callback;
+    
+    var query = '"root" in parents and trashed = false and ' +
+      'mimeType = "application/vnd.google-apps.folder"';
+      var pageToken;
+    var folders = Drive.Files.list({
+      q: query,
+      maxResults: 100,
+      pageToken: pageToken
+    });
+    Logger.log(folders);
+   }
+    // Send the value to the server and handle the response.
+    google.script.run
+        .withSuccessHandler(
+          function(msg, element) {
+            // Respond to success conditions here.
+            $('#sidebar-value').val(msg);
+            showStatus('Pulled value successfully.');
+            element.disabled = false;
+          })
+        .withFailureHandler(
+          function(msg, element) {
+            // Respond to failure conditions here.
+            showStatus(msg, 'error');
+            element.disabled = false;
+          })
+        .withUserObject(this)
+        .getActiveValue();
+  }
+
+  /**
+   * Displays the given status message in the sidebar.
+   *
+   * @param {String} msg The status message to display.
+   * @param {String} classId The message type (class id) that the message
+   *   should be displayed as.
+   */
+  function showStatus(msg, classId) {
+    $('#sidebar-status').removeClass().html(msg);
+    if (classId) {
+      $('#sidebar-status').addClass(classId);
+    }
+  }
+
+</script>
+
+
+
