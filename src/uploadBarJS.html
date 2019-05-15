@@ -30,7 +30,7 @@
     
     var query = '"root" in parents and trashed = false and ' +
       'mimeType = "application/vnd.google-apps.folder"';
-      var pageToken;
+    var pageToken;
     var folders = Drive.Files.list({
       q: query,
       maxResults: 100,

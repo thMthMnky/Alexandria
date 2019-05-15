@@ -13,7 +13,9 @@ var TERNARYARY_COLOR = '#C0C0C0'; // Silver: (192,192,192)
 var SIDEDBAR_TITLE = 'Upload Data 2 Drive';
 var SIDEBAR_HEIGTH = '600';
 var SIDEBAR_WIDTH = '400';
-
+var HEADER_TEXT_HORZ_ALIGNMENT = 'center';
+var HEADER_TEXT_VERT_ALIGNMENT = 'middle';
+var HEADER_FONT_SIZE = 14;
 /**
  * Adds a custom menu with items to show the sidebar and dialog.
  *
@@ -226,7 +228,7 @@ function test_Columns(){
 function Header(columns, opts){
   this.columns = columns;
   this.index =  Object.keys(this.columns);
-  this.visible = true
+  this.visible = true;
   
   this.ss = opts && opts.ss ? opts.ss : SpreadsheetApp.getActiveSpreadsheet();
   this.sheet = opts && opts.sheet ? opts.sheet: this.ss.getActiveSheet();
@@ -235,58 +237,61 @@ function Header(columns, opts){
   this.width = opts && opts.width ? opts.width : 1; 
 } 
 
+Header.prototype.isEqualTo = function(obj){
+  var self = this;
+  var isSameHeader = true;
+  if(typeof obj === "Object"){
+    Object.keys(obj).reduce(function(acc, curr){return acc && (obj[curr] == self[curr])}, isSameHeader);
+  }
+  return isSameHeaders;
+}
+
 /* Render new header on current active sheet */ 
 Header.prototype.render = function(){ 
   var self = this;
+
   var headings = [self.index];
-  while(headings.length < self.width)headings.push(emptyStringArrayOfLength(self.index.length))
+  while(headings.length < self.width)headings.push(emptyStringArrayOfLength(self.index.length));
   headings.reverse();
+
   self.sheet.getRange(self.row, self.column, headings.length, self.index.length)
-  .setBackground(PRIMARY_COLOR)
+  .setBackground(PRIMARY_COLOR) 
   .setFontColor(PRIMARY_FONT_COLOR)
-  .setHorizontalAlignment('center')
-  .setVerticalAlignment('middle')
-  .setFontSize(14)
+  .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
+  .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
+  .setFontSize(HEADER_FONT_SIZE)// 14
   .setValues(headings);
 };
 
 /* Shift the header X units to the right */ 
-Header.prototype.shift = function(direction){
-  var self = this
-  var headings = [self.index];
-  self.sheet.deleteRow(self.row);
-  
-  switch(direction){
-    case 'right':
-      self.column++;
-      break;
-    case 'left':
-      self.column--;
-      break;
-    case 'up':
-      self.row--;
-      break;
-    case 'down':
-      self.row++;
-      break;
+Header.prototype.shift = function(amount, direction){
+  var self = this;
+
+  self.sheet.deleteRows(self.row, self.width);
+  while(amount > 0){
+    switch(direction){
+      case 'right':
+        self.column++;
+        break;
+      case 'left':
+        self.column--;
+        break;
+      case 'up':
+        self.row--;
+        break;
+      case 'down':
+        self.row++;
+        break;
+    }
+    amount--;
   }
-  
-  while(headings.length < self.width)headings.push(emptyStringArrayOfLength(self.index.length))
-  headings.reverse();
-  self.sheet.getRange(self.row, self.column, headings.length, self.index.length)
-  .setBackground(PRIMARY_COLOR) 
-  .setFontColor(SECONDARY_FONT_COLOR)
-  .setHorizontalAlignment('center')
-  .setVerticalAlignment('middle')
-  .setFontSize(14)
-  .setValues(headings)
-  .protect();
+  self.render();
 };
 
 
 Header.prototype.hide = function(){
   var self = this;
-  self.sheet.clear();
+  // self.sheet.
 };
 
 Header.prototype.update = function(){};
@@ -295,43 +300,70 @@ Header.prototype.update = function(){};
 /**
  * Tester for 'makeHeader'
  */
-function testAllTheThings() {
+function test_Header() {
+  try{
+    //before
+    const ss =  SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getActiveSheet();
+    const books = Columns(gVol, " ", 0);
+  }catch(e){
+    Logger.log(e);
+  }
+  var tests = [
+    { 
+      opts:{
+        ss: ss,
+        sheet: sheet,
+        start: {
+          row: 3,
+          column: 2
+        },
+        width: 3
+      }
+    },
+    { 
+      opts:{
+        ss: " ",
+        sheet: sheet,
+        start: {
+          row: 3,
+          column: 2
+        },
+        width: 3
+      }
+    },,
+    { 
+      opts:{
+        ss: null,
+        sheet: sheet,
+        start: {
+          row: 3,
+          column: 2
+        },
+        width: 3
+      }
+    }
+  ];
+  
   function beforeEach () {
-    var params = {};
-    params["sheet"] = SpreadsheetApp.getActiveSheet();
-    params["header"] = getCurrentHeader
-    return params;
+    sheet.getRange(row, column, numRows, numColumns).clearContent();
+    var header = new Header(books, tests[1].opts);
+  }
+  function afterEach(){
+    header.render();
   }
   
-  (function testHeaderOpts(){
-    beforeEach();
+  (function testOpts(){
+    
     Logger.log('test1');
-    var books = Columns(gVol, " ", 0);
-    var opts = {
-      start: {
-        row: 3, 
-        column: 2
-      }, 
-      width: 3
-    }
-    var header = new Header(books, opts);
-    header.render(); 
+    afterEach();
   })();
   
   (function testHeaderShifter(){
-    beforeEach();
+//    beforeEach();
     Logger.log('test2');
-    var books = Columns(gVol, " ", 0);
-    var opts = {
-      start: {
-        row: null, 
-        column: 2
-      }, 
-      width: 3
-    }
-    var header = new Header(books, opts);
-    header.render(); 
-    header.shift('down'); 
+    var header = new Header(books, tests[2].opts);
+    afterEach();
   })();
 }
 
