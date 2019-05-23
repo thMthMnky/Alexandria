@@ -1,5 +1,5 @@
 /**
- * @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
+ *  @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  *
  * Global Variables
  */
@@ -16,18 +16,20 @@ var SIDEBAR_WIDTH = '400';
 var HEADER_TEXT_HORZ_ALIGNMENT = 'center';
 var HEADER_TEXT_VERT_ALIGNMENT = 'middle';
 var HEADER_FONT_SIZE = 14;
+var HEADER_COMPONENT_PRIMARY_COLOR ='#e6b8af';
+var HEADER_COMPONENT_SECONDARY_COLOR ='#e6b8af';
 /**
  * Adds a custom menu with items to show the sidebar and dialog.
  *
  * @param {Object} e The event parameter for a simple onOpen trigger.
  */
-/*function onOpen() {
+function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui 
   .createAddonMenu()
   .addItem('GetDriveData', 'showUpLoadBar')
   .addToUi();
-}*/
+}
 
 /**
  * Opens a sidebar. The sidebar structure is described in the Sidebar.html
@@ -36,10 +38,7 @@ var HEADER_FONT_SIZE = 14;
 function showUpLoadBar() {
   var ui = HtmlService.createTemplateFromFile('uploadBar')
   .evaluate()
-  .setWidth(SIDEBAR_WIDTH)
-  .setHeight(SIDEBAR_HEIGTH)
-  .setTitle(SIDEBAR_TITLE)
-  .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+  .setSandboxMode(HtmlService.SandboxMode.IFRAME)
   SpreadsheetApp.getUi().showSidebar(ui);
 }
 
@@ -156,24 +155,26 @@ var gVol = {
 };
 
 /* Google mimeTypes */
-  var mimeTypes = [
-    'application/vnd.google-apps.audio',
-    'application/vnd.google-apps.document',
-    'application/vnd.google-apps.drawing',
-    'application/vnd.google-apps.file',
-    'application/vnd.google-apps.folder',
-    'application/vnd.google-apps.form',
-    'application/vnd.google-apps.fusiontable',
-    'application/vnd.google-apps.map',
-    'application/vnd.google-apps.photo',	
-    'application/vnd.google-apps.presentation',
-    'application/vnd.google-apps.script',
-    'application/vnd.google-apps.site',
-    'application/vnd.google-apps.spreadsheet',
-    'application/vnd.google-apps.unknown',	
-    'application/vnd.google-apps.video',	
-    'application/vnd.google-apps.drive-sdk'
-  ];
+var mimeTypes = {
+  'audio': 'application/vnd.google-apps.audio',
+  'document': 'application/vnd.google-apps.document',
+  'drawing': 'application/vnd.google-apps.drawing',
+  'file': 'application/vnd.google-apps.file',
+  'folder': 'application/vnd.google-apps.folder',
+  'form': 'application/vnd.google-apps.form',
+  'fusiontable': 'application/vnd.google-apps.fusiontable',
+  'map': 'application/vnd.google-apps.map',
+  'photo': 'application/vnd.google-apps.photo',	
+  'presentation': 'application/vnd.google-apps.presentation',
+  'script': 'application/vnd.google-apps.script',
+  'site': 'application/vnd.google-apps.site',
+  'spreadsheet': 'application/vnd.google-apps.spreadsheet',
+  'unknown': 'application/vnd.google-apps.unknown',	
+  'video': 'application/vnd.google-apps.video',	
+  'drive-sdk': 'application/vnd.google-apps.drive-sdk'
+};
+
+var mimeTypes_keys = Object.keys(mimeTypes);
 
 
 /**
@@ -235,6 +236,10 @@ function Header(columns, opts){
   this.row = opts && opts.start.row ? opts.start.row : 1;
   this.column = opts && opts.start.column ? opts.start.column : 1;
   this.width = opts && opts.width ? opts.width : 1; 
+  
+  this.updatedBy = this.ss.getEditors();
+  this.updatedDate = Date.now();;
+  this.updatedNum = this.ss.getLastRow();
 } 
 
 Header.prototype.isEqualTo = function(obj){
@@ -249,18 +254,38 @@ Header.prototype.isEqualTo = function(obj){
 /* Render new header on current active sheet */ 
 Header.prototype.render = function(){ 
   var self = this;
-
   var headings = [self.index];
+  var header_range = self.sheet.getRange(self.row, self.column, headings.length, self.index.length);
+  var update_component_fields = SpreadsheetApp.getActiveSheet().getRange(self.row + 1, self.column + 1, 3, 1);
+  var update_component_values = SpreadsheetApp.getActiveSheet().getRange(self.row + 1, self.column + 2, 3, 1);
+  
   while(headings.length < self.width)headings.push(emptyStringArrayOfLength(self.index.length));
+  
   headings.reverse();
-
-  self.sheet.getRange(self.row, self.column, headings.length, self.index.length)
+  
+  header_range
   .setBackground(PRIMARY_COLOR) 
   .setFontColor(PRIMARY_FONT_COLOR)
   .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
   .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
   .setFontSize(HEADER_FONT_SIZE)// 14
   .setValues(headings);
+  
+  update_component_fields
+  .setBackground(HEADER_COMPONENT_PRIMARY_COLOR)
+  .setFontColor(PRIMARY_FONT_COLOR)
+  .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
+  .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
+  .setFontSize(HEADER_FONT_SIZE)// 14
+  .setValues(['By:', 'Date:', '\#\{Entries\}']);
+
+  update_component_values
+  .setBackground(HEADER_COMPONENT_SECONDARY_COLOR)
+  .setFontColor(SECONDARY_FONT_COLOR)
+  .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
+  .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
+  .setFontSize(HEADER_FONT_SIZE)// 14
+  .setValues([self.updatedBy, self.updatedDate, self.updatedNum]);
 };
 
 /* Shift the header X units to the right */ 
@@ -300,12 +325,13 @@ Header.prototype.update = function(){};
 /**
  * Tester for 'makeHeader'
  */
-function test_Header() {
+function test_Header(){
   try{
     //before
-    const ss =  SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getActiveSheet();
-    const books = Columns(gVol, " ", 0);
+    var ss =  SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getActiveSheet();
+    var books = Columns(gVol, " ", 0);
+    var headers = [];
   }catch(e){
     Logger.log(e);
   }
@@ -345,95 +371,69 @@ function test_Header() {
     }
   ];
   
-  function beforeEach () {
+  function beforeEach(current_idx){
     sheet.getRange(row, column, numRows, numColumns).clearContent();
-    var header = new Header(books, tests[1].opts);
+    headers.push(new Header(books, tests[current_idx].opts));
+    Logger.log('test'+i);
   }
-  function afterEach(){
-    header.render();
-  }
-  
-  (function testOpts(){
+  function run(current_idx){
+    // grab drive data and convert it to a header
     
-    Logger.log('test1');
-    afterEach();
-  })();
+  }
+  function afterEach(current_idx){
+    headers[current_idx].render();
+  }
+
+  (
+    function Result(){
+      for(var i = 0; i < tests.length; i++){
+        var result = false;
+        beforeEach(i);
+        afterEach(i);
+        return result;
+      }
+    }
+    )();
   
-  (function testHeaderShifter(){
-//    beforeEach();
-    Logger.log('test2');
-    var header = new Header(books, tests[2].opts);
-    afterEach();
-  })();
 }
 
-function getDriveData(){
+function getAllDriveData(){
   
   // Log the name of every file in the user's Drive.
   var drive_root = DriveApp.getRootFolder();
   var drive_root_url = drive_root.getUrl();// => "https://drive.google.com/drive/folders/0AKQjGqGbfd08Uk9PVA"
-  var drive_root_files = drive_root.getFiles();
-  var drive_root_folders = drive_root.getFolders();
   var allFiles = {};
+  var allFolders = {};
   
-  while(drive_root_files.hasNext()){
-    var file = drive_root_files.next();
-    allFiles[file.getId()] = [file.getName(), file.getMimeType()];
+  function walk(folder, sep){
+    var folderName = folder.getName();
+    var files = folder.getFiles();
+    while(files.hasNext()){
+      var file = files.next();
+      var fileId = file.getId();
+      var fileName = file.getName();
+      var fileType = file.getMimeType();
+      
+      if(fileType != mimeTypes.folder){
+        allFiles[fileId] = [folderName + sep + fileName, fileType]; 
+      } else {
+        allFolders[folder.getId()] = folderName;
+        walk(file, sep);
+      }
+    }
   }
-  while(drive_root_folders.hasNext()){
-    var folder = drive_root_folders.next();
-    allFiles[folder.getId()] = [folder.getName()];
-  }
-  return allFiles;
+  walk(drive_root, ".");
+  return [allFiles, allFolders];
 }
 
-function testGetDriveData(){
-  var files = getDriveData();
-  Object.keys(files).forEach(function(file){
-    Logger.log(files[file]);
-  });
-}
-/**
-* Return a list of book volumes matching a give query string
-* @see https://developers.google.com/books/docs/v1/reference/volumes/list 
-*/
-/*
-function match(str, opts, callback){
-  var volume_name = str;
-  // var {version, author, tag} = opTs;
-  var cbFunction = callback;
-  
-  var query = '"root" in parents and trashed = false and mimeType = "application/vnd.google-apps.folder"';
-  var pageToken;
-  var folders = Drive.Files.list({
-    q: query,
-    maxResults: 100,
-    pageToken: pageToken
-  });
-  Logger.log(folders);
-}
-*/
-
-/**
- * Executes the specified action (create a new sheet, copy the active sheet, or
- * clear the current sheet).
- *
- * @param {String} action An identifier for the action to take.
- */
-function modifySheets(action) {
-  // Use data collected from dialog to manipulate the spreadsheet.
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var currentSheet = ss.getActiveSheet();
-  if (action == "create") {
-    ss.insertSheet();
-  } else if (action == "copy") {
-    currentSheet.copyTo(ss);
-  } else if (action == "clear") {
-    currentSheet.clear();
-  }
+function testGetAllDriveData(){
+  var data = getAllDriveData();
+  var allFiles = data[0];
+  var allFolders = data[1];
+  Logger.log(allFiles);
+  Logger.log(allFolders);
 }
 
-/* */
 function emptyStringArrayOfLength(num){
   var arr = [];
   while(arr.length < num) arr.push("");

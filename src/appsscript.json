@@ -10,6 +10,10 @@
       "serviceId": "drive",
       "version": "v2"
     }, {
+      "userSymbol": "People",
+      "serviceId": "peopleapi",
+      "version": "v1"
+    }, {
       "userSymbol": "AppsActivity",
       "serviceId": "appsactivity",
       "version": "v1"
