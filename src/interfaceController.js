@@ -7,7 +7,7 @@ var COLUMN_WIDTH = '16px';
 var ROW_HEIGHT = '32px';
 var PRIMARY_COLOR = '#8B0000'; // Dark Red: (139,0,0)
 var PRIMARY_FONT_COLOR = '#ffffff'; // White: (255,255,255)
-var SECONDARY_FONT_COLOR = '#0000000'
+var SECONDARY_FONT_COLOR = '#0000000';
 var SECONDARY_COLOR = '#808080'; // Gray: (128,128,128)
 var TERNARYARY_COLOR = '#C0C0C0'; // Silver: (192,192,192)
 var SIDEDBAR_TITLE = 'Upload Data 2 Drive';
@@ -38,7 +38,7 @@ function onOpen() {
 function showUpLoadBar() {
   var ui = HtmlService.createTemplateFromFile('uploadBar')
   .evaluate()
-  .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+  .setSandboxMode(HtmlService.SandboxMode.IFRAME);
   SpreadsheetApp.getUi().showSidebar(ui);
 }
 
@@ -238,18 +238,18 @@ function Header(columns, opts){
   this.width = opts && opts.width ? opts.width : 1; 
   
   this.updatedBy = this.ss.getEditors();
-  this.updatedDate = Date.now();;
+  this.updatedDate = Date.now();
   this.updatedNum = this.ss.getLastRow();
 } 
 
 Header.prototype.isEqualTo = function(obj){
   var self = this;
   var isSameHeader = true;
-  if(typeof obj === "Object"){
-    Object.keys(obj).reduce(function(acc, curr){return acc && (obj[curr] == self[curr])}, isSameHeader);
+  if(typeof obj === typeof self){
+    Object.keys(obj).reduce(function(acc, curr){return acc && (obj[curr] == self[curr]);}, isSameHeader);
   }
   return isSameHeaders;
-}
+};
 
 /* Render new header on current active sheet */ 
 Header.prototype.render = function(){ 
@@ -326,12 +326,14 @@ Header.prototype.update = function(){};
  * Tester for 'makeHeader'
  */
 function test_Header(){
+  var ss =null;
+  var sheet = null;
+  var headers = [];
+  var books = Columns(gVol, " ", 0);
   try{
     //before
-    var ss =  SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = ss.getActiveSheet();
-    var books = Columns(gVol, " ", 0);
-    var headers = [];
+    ss =  SpreadsheetApp.getActiveSpreadsheet();
+    sheet = ss.getActiveSheet();
   }catch(e){
     Logger.log(e);
   }
@@ -357,7 +359,7 @@ function test_Header(){
         },
         width: 3
       }
-    },,
+    },
     { 
       opts:{
         ss: null,
@@ -378,7 +380,7 @@ function test_Header(){
   }
   function run(current_idx){
     // grab drive data and convert it to a header
-    
+
   }
   function afterEach(current_idx){
     headers[current_idx].render();
