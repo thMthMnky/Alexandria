@@ -254,38 +254,45 @@ Header.prototype.isEqualTo = function(obj){
 /* Render new header on current active sheet */ 
 Header.prototype.render = function(){ 
   var self = this;
-  var headings = [self.index];
-  var header_range = self.sheet.getRange(self.row, self.column, headings.length, self.index.length);
-  var update_component_fields = SpreadsheetApp.getActiveSheet().getRange(self.row + 1, self.column + 1, 3, 1);
-  var update_component_values = SpreadsheetApp.getActiveSheet().getRange(self.row + 1, self.column + 2, 3, 1);
+
+  function emptyStringArrayOfLength(num){
+    var arr = [];
+    while(arr.length < num) arr.push("");
+    return arr;
+  }
+
+  var _header_rows = [self.index];
+  while(_header_rows.length < self.width)_header_rows.push(emptyStringArrayOfLength(self.index.length));
+  _header_rows.reverse();
+  var _header = [self.sheet.getRange(self.row, self.column, _header_rows.length, self.index.length), _header_rows];
   
-  while(headings.length < self.width)headings.push(emptyStringArrayOfLength(self.index.length));
-  
-  headings.reverse();
-  
-  header_range
+  _header
   .setBackground(PRIMARY_COLOR) 
   .setFontColor(PRIMARY_FONT_COLOR)
   .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
   .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
   .setFontSize(HEADER_FONT_SIZE)// 14
-  .setValues(headings);
+  .setValues(_header_rows);
+
+  var _header_metadata = {};
+  _header_metadata.fields = [SpreadsheetApp.getActiveSheet().getRange(self.row + 1, self.column + 1, 3, 1), ['By:', 'Date:', '\#\{Entries\}']];
+  _header_metadata.values = [SpreadsheetApp.getActiveSheet().getRange(self.row + 1, self.column + 2, 3, 1), [self.updatedBy, self.updatedDate, self.updatedNum]];
   
-  update_component_fields
+  _header_metadata.fields[0]
   .setBackground(HEADER_COMPONENT_PRIMARY_COLOR)
   .setFontColor(PRIMARY_FONT_COLOR)
   .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
   .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
   .setFontSize(HEADER_FONT_SIZE)// 14
-  .setValues(['By:', 'Date:', '\#\{Entries\}']);
+  .setValues(update_component.fields[1]);
 
-  update_component_values
+  _header_metadata.values[0]
   .setBackground(HEADER_COMPONENT_SECONDARY_COLOR)
   .setFontColor(SECONDARY_FONT_COLOR)
   .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
   .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
   .setFontSize(HEADER_FONT_SIZE)// 14
-  .setValues([self.updatedBy, self.updatedDate, self.updatedNum]);
+  .setValues(update_component.values[1]);
 };
 
 /* Shift the header X units to the right */ 
@@ -326,18 +333,23 @@ Header.prototype.update = function(){};
  * Tester for 'makeHeader'
  */
 function test_Header(){
-  var ss =null;
+  var ss = null;
   var sheet = null;
-  var headers = [];
-  var books = Columns(gVol, " ", 0);
-  try{
-    //before
-    ss =  SpreadsheetApp.getActiveSpreadsheet();
-    sheet = ss.getActiveSheet();
-  }catch(e){
-    Logger.log(e);
-  }
-  var tests = [
+  var books = {};
+
+  var result = true;
+  var tests =[];
+  var candidates = [];
+
+  /** 
+   * [TODO] Make  a Test Maker.
+   * 
+   * @desc "Create a @function getTests that will 
+   * return an @array of tests. Each test will 
+   * consist of an @object which will represent the 
+   * signature of the `Header` @object . "
+   * */
+   tests /* = getTests(); */ = [
     { 
       opts:{
         ss: ss,
@@ -373,14 +385,26 @@ function test_Header(){
     }
   ];
   
+  function before(){
+    try{
+      ss =  SpreadsheetApp.getActiveSpreadsheet();
+      sheet = ss.getActiveSheet();
+      books = Columns(gVol, " ", 0);
+    }catch(e){
+      Logger.log(e);
+    }
+  }
   function beforeEach(current_idx){
     sheet.getRange(row, column, numRows, numColumns).clearContent();
-    headers.push(new Header(books, tests[current_idx].opts));
-    Logger.log('test'+i);
+    candidates.push(new Header(books, tests[current_idx].opts));
+    Logger.log('test'+current_idx);
   }
   function run(current_idx){
     // grab drive data and convert it to a header
-
+    // 
+    var ththingreturning = true;
+    Logger.log(ththingreturning);
+    return ththingreturning;
   }
   function afterEach(current_idx){
     headers[current_idx].render();
@@ -388,16 +412,17 @@ function test_Header(){
 
   (
     function Result(){
+      before();
       for(var i = 0; i < tests.length; i++){
-        var result = false;
         beforeEach(i);
+        result = result && run(i);
         afterEach(i);
-        return result;
       }
+      after();
     }
     )();
-  
-}
+    return result;
+  }
 
 function getAllDriveData(){
   
@@ -434,10 +459,4 @@ function testGetAllDriveData(){
   var allFolders = data[1];
   Logger.log(allFiles);
   Logger.log(allFolders);
-}
-
-function emptyStringArrayOfLength(num){
-  var arr = [];
-  while(arr.length < num) arr.push("");
-  return arr;
 }
