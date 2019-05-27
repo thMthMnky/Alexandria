@@ -246,7 +246,9 @@ Header.prototype.isEqualTo = function(obj){
   var self = this;
   var isSameHeader = true;
   if(typeof obj === typeof self){
-    Object.keys(obj).reduce(function(acc, curr){return acc && (obj[curr] == self[curr]);}, isSameHeader);
+    Object.keys(obj).reduce(function(acc, curr){
+      return acc && (obj[curr] == self[curr]);
+    }, isSameHeader);
   }
   return isSameHeaders;
 };
@@ -323,112 +325,102 @@ Header.prototype.shift = function(amount, direction){
 
 Header.prototype.hide = function(){
   var self = this;
-  // self.sheet.
+  self.sheet.getRange();
 };
 
 Header.prototype.update = function(){};
 
 
 /**
- * Tester for 'makeHeader'
+ * Test for 'makeHeader'
  */
-function test_Header(){
-  var ss = null;
-  var sheet = null;
-  var books = {};
-
+function testHeader(){
   var result = true;
-  var tests =[];
   var candidates = [];
-
   /** 
    * [TODO] Make  a Test Maker.
    * 
    * @desc "Create a @function getTests that will 
    * return an @array of tests. Each test will 
    * consist of an @object which will represent the 
-   * signature of the `Header` @object . "
-   * */
-   tests /* = getTests(); */ = [
-    { 
-      opts:{
-        ss: ss,
-        sheet: sheet,
-        start: {
-          row: 3,
-          column: 2
+   * signature of the `Header` @object . For example 
+   * @function getTests('3::tip') would return something like:
+   * 
+   */
+  function createTests(str){
+    var opts = [null, "", [], {} ];
+    var allPossibilities = {
+      vols: opts.concat([gVol]),
+      opts: {
+        ss: opts.concat([SpreadsheetApp.getActiveSpreadsheet()]),
+        sheet: opts.concat([SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(), SpreadsheetApp.getActiveSheet()]),
+        start:{
+          row: opts.concat([-6, 0, 3]),
+          col: opts.concat([-2, 0, 7]),
         },
-        width: 3
+        width: opts.concat([-3, 0, 5, NaN])
       }
-    },
-    { 
-      opts:{
-        ss: " ",
-        sheet: sheet,
-        start: {
-          row: 3,
-          column: 2
-        },
-        width: 3
-      }
-    },
-    { 
-      opts:{
-        ss: null,
-        sheet: sheet,
-        start: {
-          row: 3,
-          column: 2
-        },
-        width: 3
-      }
+    };
+    var tests = [];
+    if(str.indexOf(':') === str.lastIndexOf(':')){
+      var isTheStringGood =  ( typeof number(strList[0]) != "number" || typeof number(strList[2]) != "number"); 
+      var strList = isTheStringGood ? str.split(':') : ["", ":", ""];
     }
-  ];
+    switch(str){
+      case ':':
+      case '':
+    }
+
+    return tests;
+  }
   
   function before(){
     try{
-      ss =  SpreadsheetApp.getActiveSpreadsheet();
-      sheet = ss.getActiveSheet();
-      books = Columns(gVol, " ", 0);
+      sheet.getRange(row, column, numRows, numColumns).clearContent();
+      tests = getTests();
     }catch(e){
       Logger.log(e);
     }
   }
   function beforeEach(current_idx){
-    sheet.getRange(row, column, numRows, numColumns).clearContent();
+      
+      books = Columns(gVol, " ", 0);
     candidates.push(new Header(books, tests[current_idx].opts));
     Logger.log('test'+current_idx);
   }
+
+  /**
+   * [TODO] Run the test 
+   * 
+   * "For the candidate at position @current_idx , "
+   * */
   function run(current_idx){
-    // grab drive data and convert it to a header
-    // 
     var ththingreturning = true;
+
+
     Logger.log(ththingreturning);
     return ththingreturning;
   }
   function afterEach(current_idx){
     headers[current_idx].render();
   }
-
-  (
-    function Result(){
-      before();
-      for(var i = 0; i < tests.length; i++){
-        beforeEach(i);
-        result = result && run(i);
-        afterEach(i);
-      }
-      after();
+  
+  function Result(){
+    before();
+    for(var i = 0; i < tests.length; i++){
+      beforeEach(i);
+      result = result && run(i);
+      afterEach(i);
     }
-    )();
-    return result;
+    after();
   }
+  return Result();
+}
 
 function getAllDriveData(){
-  
+
   // Log the name of every file in the user's Drive.
   var drive_root = DriveApp.getRootFolder();
-  var drive_root_url = drive_root.getUrl();// => "https://drive.google.com/drive/folders/0AKQjGqGbfd08Uk9PVA"
   var allFiles = {};
   var allFolders = {};
   
