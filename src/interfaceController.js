@@ -337,41 +337,47 @@ Header.prototype.update = function(){};
 function testHeader(){
   var result = true;
   var candidates = [];
-  /** 
-   * [TODO] Make  a Test Maker.
-   * 
-   * @desc "Create a @function getTests that will 
-   * return an @array of tests. Each test will 
-   * consist of an @object which will represent the 
-   * signature of the `Header` @object . For example 
-   * @function getTests('3::tip') would return something like:
-   * 
-   */
-  function createTests(str){
-    var opts = [null, "", [], {} ];
-    var allPossibilities = {
-      vols: opts.concat([gVol]),
-      opts: {
-        ss: opts.concat([SpreadsheetApp.getActiveSpreadsheet()]),
-        sheet: opts.concat([SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(), SpreadsheetApp.getActiveSheet()]),
-        start:{
-          row: opts.concat([-6, 0, 3]),
-          col: opts.concat([-2, 0, 7]),
-        },
-        width: opts.concat([-3, 0, 5, NaN])
-      }
-    };
-    var tests = [];
-    if(str.indexOf(':') === str.lastIndexOf(':')){
-      var isTheStringGood =  ( typeof number(strList[0]) != "number" || typeof number(strList[2]) != "number"); 
-      var strList = isTheStringGood ? str.split(':') : ["", ":", ""];
-    }
-    switch(str){
-      case ':':
-      case '':
-    }
+  
+  function getTests(str     ){
+    // Common initialization values
+    var Opts = [null, "", [], {} ];
+    
+    // Create a die
+    var dice = [
+      Opts.concat([gVol]),
+      Opts.concat([SpreadsheetApp.getActiveSpreadsheet()]),
+      Opts.concat([SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(), SpreadsheetApp.getActiveSheet()]),
+      Opts.concat([NaN, -6, 0, 3]),
+      Opts.concat([NaN, -2, 0, 7]),
+      Opts.concat([NaN, -2, 0, 7]) 
+    ];
 
-    return tests;
+    // Test object model
+    var params = {
+      vols: null,
+      opts: {
+        ss: null,
+        sheet: null,
+        start:{
+          row: null,
+          col: null,
+        },
+        width: null
+      }  
+    };
+
+    // Get a random number
+    var randInt = function(N) { return Math.floor(N*Math.random()); };
+
+    // Roll the dice
+    params.vols = dice[0][randInt(dice[0].length)];
+    params.Opts.ss = dice[1][randInt(dice[1].length)];
+    params.Opts.sheet = dice[2][randInt(dice[2].length)];
+    params.Opts.start.row = dice[3][randInt(dice[3].length)];
+    params.Opts.start.col = dice[4][randInt(dice[4].length)];
+    params.Opts.width = dice[5][randInt(dice[5].length)];
+
+    return params;
   }
   
   function before(){
