@@ -1,0 +1,446 @@
+Git Log for Alexandria\n
+Branch UploadSideBar status:
+[TEMP] Ending Session in UploadSideBar
+Branch UploadSideBar status:
+[TEMP] Ending Session in UploadSideBar
+Branch UploadSideBar status:
+[TEMP] Ending Session in UploadSideBar
+Branch UploadSideBar status:
+[TEMP] Ending Session in UploadSideBar
+Branch UploadSideBar status:
+[TEMP] Ending Session in UploadSideBar
+stash@{0}: On UploadSideBar: Ending Session in UploadSideBar
+stash@{1}: On UploadSideBar: Ending Session in branch:
+On branch UploadSideBar
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   .DS_Store
+	new file:   .git_logs.txt
+	modified:   src/Stylesheet.html
+	modified:   src/uploadBar.html
+	modified:   src/uploadBarJS.html
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   .git_logs.txt
+
+diff --git a/.DS_Store b/.DS_Store
+index 3ec123c..9951dec 100644
+Binary files a/.DS_Store and b/.DS_Store differ
+diff --git a/.git_logs.txt b/.git_logs.txt
+new file mode 100644
+index 0000000..16007f6
+--- /dev/null
++++ b/.git_logs.txt
+@@ -0,0 +1,11 @@
++Git Log for Alexandria\n
++Branch UploadSideBar status:
++[TEMP] Ending Session in UploadSideBar
++Branch UploadSideBar status:
++[TEMP] Ending Session in UploadSideBar
++Branch UploadSideBar status:
++[TEMP] Ending Session in UploadSideBar
++Branch UploadSideBar status:
++[TEMP] Ending Session in UploadSideBar
++Branch UploadSideBar status:
++[TEMP] Ending Session in UploadSideBar
+diff --git a/src/Stylesheet.html b/src/Stylesheet.html
+index db23def..18a3324 100644
+--- a/src/Stylesheet.html
++++ b/src/Stylesheet.html
+@@ -25,7 +25,7 @@ label {
+   width: 100%;
+   box-sizing: border-box;
+   -webkit-box-sizing: border-box;‌
+-  -moz-box-sizing: border-box;
++  /* -moz-box-sizing: border-box; */
+ }
+ 
+ #sidebar-value-block,
+diff --git a/src/uploadBar.html b/src/uploadBar.html
+index 1bd21db..29ff515 100644
+--- a/src/uploadBar.html
++++ b/src/uploadBar.html
+@@ -32,7 +32,11 @@
+     <div class="sidebar branding-below">
+       
+       <p> This sidebar allows you to add either a folder or a file from Drive. </p>
+-
++      <div>
++        <button type="button" id="gas_ss_get" onclick="getAllDriveData()">  </button>
++        <input>
++      </div>
++<!-- 
+       <div class="block form-group" id="sidebar-value-block">
+         <label for="sidebar-value">Sidebar value:</label>
+         <input id="sidebar-value" value="37">
+@@ -42,7 +46,7 @@
+         <button id="sidebar-pull-button">Add Books</button>      
+       </div>
+ 
+-      <div id="sidebar-status"></div>
++      <div id="sidebar-status"></div> -->
+       
+       <!-- [DEP] Keep until the button populates the Active Spreadsheet -->
+       <!-- <form id="myForm" onsubmit="handleFormSubmit(this)">
+diff --git a/src/uploadBarJS.html b/src/uploadBarJS.html
+index b2a7b56..13abee8 100644
+--- a/src/uploadBarJS.html
++++ b/src/uploadBarJS.html
+@@ -38,44 +38,36 @@
+     });
+     Logger.log(folders);
+    }
+-    /** 
+-     * [TODO] Send the value to the server and handle the response.
+-     * 
+-     * For @example:
+-     * 
+-     *          @function handleFormSubmit(
+-     *            @params formObject 
+-     *            @runs google.script.run.withSuccessHandler(updateUrl).processForm(formObject);
+-     *            @returns urlString
+-     * 
+-     *           @function updateUrl
+-     *             @params urlString 
+-     *             @runs {
+-     *               var div = document.getElementById('output');
+-     *               div.innerHTML = '<a href="' + urlString + '">Got it!</a>';
+-     *             } 
+-     * */ 
+-    google.script.run
+-        .withSuccessHandler(
+-//          function(msg, element) {
+-//            // Respond to success conditions here.
+-//            $('#sidebar-value').val(msg);
+-//            showStatus('Pulled value successfully.');
+-//            element.disabled = true;
+-//          }
+-          )
+-        .withFailureHandler(
+-//          function(msg, element) {
+-//            // Respond to failure conditions here.
+-//            showStatus(msg, 'error');
+-//            element.disabled = false;
+-//          }
+-          )
+-        .withUserObject(this)
+-        .getAllDriveData();
+ 
++  /** 
++    * [TODO] Send the value to the server and handle the response.
++    * 
++    * For @example:
++    * 
++    *  @function handleFormSubmit(
++    *  @params formObject 
++    *  @runs google.script.run.withSuccessHandler(updateUrl).processForm(formObject);
++    *  @returns urlString
++    * 
++    *  @function updateUrl
++    *  @params urlString 
++    *  @runs document.getElementById('output').innerHTML = '<a href="' + urlString + '">Got it!</a>';
++    * */ 
++  google.script.run
++      .withSuccessHandler()
++      .withFailureHandler()
++      .withUserObject(this)
++      .getAllDriveData();
++
++  function(msg, element) {
++    // Respond to success conditions here.
++    $('#sidebar-value').val(msg);
++    showStatus('Pulled value successfully.');
++    element.disabled = true;
+   }
+ 
++}
++
+   /**
+    * Displays the given status message in the sidebar.
+    *
+commit 2470965e339fd9c97c9b2a65bf8b51d73f914733
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Sat Jun 1 20:51:56 2019 -0700
+
+    [WIP] Cleaning 'uploadBar' and 'uploadBarJS'
+
+commit 30e68db2b94386dd3acc6876a31a7db49e15b0d0
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Sat Jun 1 16:55:51 2019 -0700
+
+    [WIP] Cleaning 'uploadBar' and 'uploadBarJS'
+
+commit 9c147efc51f7c7c645d0bc1519ef8ad11c8a2458
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Sat Jun 1 16:20:42 2019 -0700
+
+    [WIP] Building Testing Framework: Creating Methods
+
+commit 74c4b7dc5b14b1e8d887a1e11538b9480be560d2
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Mon May 27 15:39:04 2019 -0700
+
+    [WIP] Building Testing Framework: Dice Roll
+
+commit 53421a915d13e335428410583b5f2d99ee8eee0b
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Sun May 26 21:48:50 2019 -0700
+
+    [WIP] Building Testing Framework: Dice
+
+commit 37b4c6bb4bf6de1e67d03ce4303e8e191df606c6
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Thu May 23 23:42:10 2019 -0700
+
+    [WIP] Building Testing Framework
+
+commit 2eb503ca28ad9dca4008e682a2a52d0e6d84f8f4
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Thu May 23 07:35:25 2019 -0700
+
+    Fixed Linting Errors
+
+commit c9fd575ce5dfb78bd40a6335fd53499aebac93a4
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Thu May 23 01:16:58 2019 -0700
+
+    [WIP] Driveapp_webhook; Testing Framework
+
+commit 7b275703d318a0015e8a7fc4f20c0af290e22f7d
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Tue May 14 22:01:19 2019 -0700
+
+    [WIP] Header Testing Suite
+
+commit 26af5abb8363a616c8837bc182ac793cb8163b4a
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Sat May 11 13:12:19 2019 -0700
+
+    Initial commit.
+
+commit fa42f190aad99b52928022c78c41a322e44c100b
+Author: Henry O Zorrilla <12237673+thMthMnky@users.noreply.github.com>
+Date:   Sat May 11 12:30:48 2019 -0700
+
+    Initial commit
+UploadSideBar branch status:
+On branch UploadSideBar
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   .DS_Store
+	new file:   .git_logs.txt
+	modified:   src/Stylesheet.html
+	modified:   src/uploadBar.html
+	modified:   src/uploadBarJS.html
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   .git_logs.txt
+
+diff --git a/.DS_Store b/.DS_Store
+index 3ec123c..9951dec 100644
+Binary files a/.DS_Store and b/.DS_Store differ
+diff --git a/.git_logs.txt b/.git_logs.txt
+new file mode 100644
+index 0000000..16007f6
+--- /dev/null
++++ b/.git_logs.txt
+@@ -0,0 +1,11 @@
++Git Log for Alexandria\n
++Branch UploadSideBar status:
++[TEMP] Ending Session in UploadSideBar
++Branch UploadSideBar status:
++[TEMP] Ending Session in UploadSideBar
++Branch UploadSideBar status:
++[TEMP] Ending Session in UploadSideBar
++Branch UploadSideBar status:
++[TEMP] Ending Session in UploadSideBar
++Branch UploadSideBar status:
++[TEMP] Ending Session in UploadSideBar
+diff --git a/src/Stylesheet.html b/src/Stylesheet.html
+index db23def..18a3324 100644
+--- a/src/Stylesheet.html
++++ b/src/Stylesheet.html
+@@ -25,7 +25,7 @@ label {
+   width: 100%;
+   box-sizing: border-box;
+   -webkit-box-sizing: border-box;‌
+-  -moz-box-sizing: border-box;
++  /* -moz-box-sizing: border-box; */
+ }
+ 
+ #sidebar-value-block,
+diff --git a/src/uploadBar.html b/src/uploadBar.html
+index 1bd21db..29ff515 100644
+--- a/src/uploadBar.html
++++ b/src/uploadBar.html
+@@ -32,7 +32,11 @@
+     <div class="sidebar branding-below">
+       
+       <p> This sidebar allows you to add either a folder or a file from Drive. </p>
+-
++      <div>
++        <button type="button" id="gas_ss_get" onclick="getAllDriveData()">  </button>
++        <input>
++      </div>
++<!-- 
+       <div class="block form-group" id="sidebar-value-block">
+         <label for="sidebar-value">Sidebar value:</label>
+         <input id="sidebar-value" value="37">
+@@ -42,7 +46,7 @@
+         <button id="sidebar-pull-button">Add Books</button>      
+       </div>
+ 
+-      <div id="sidebar-status"></div>
++      <div id="sidebar-status"></div> -->
+       
+       <!-- [DEP] Keep until the button populates the Active Spreadsheet -->
+       <!-- <form id="myForm" onsubmit="handleFormSubmit(this)">
+diff --git a/src/uploadBarJS.html b/src/uploadBarJS.html
+index b2a7b56..13abee8 100644
+--- a/src/uploadBarJS.html
++++ b/src/uploadBarJS.html
+@@ -38,44 +38,36 @@
+     });
+     Logger.log(folders);
+    }
+-    /** 
+-     * [TODO] Send the value to the server and handle the response.
+-     * 
+-     * For @example:
+-     * 
+-     *          @function handleFormSubmit(
+-     *            @params formObject 
+-     *            @runs google.script.run.withSuccessHandler(updateUrl).processForm(formObject);
+-     *            @returns urlString
+-     * 
+-     *           @function updateUrl
+-     *             @params urlString 
+-     *             @runs {
+-     *               var div = document.getElementById('output');
+-     *               div.innerHTML = '<a href="' + urlString + '">Got it!</a>';
+-     *             } 
+-     * */ 
+-    google.script.run
+-        .withSuccessHandler(
+-//          function(msg, element) {
+-//            // Respond to success conditions here.
+-//            $('#sidebar-value').val(msg);
+-//            showStatus('Pulled value successfully.');
+-//            element.disabled = true;
+-//          }
+-          )
+-        .withFailureHandler(
+-//          function(msg, element) {
+-//            // Respond to failure conditions here.
+-//            showStatus(msg, 'error');
+-//            element.disabled = false;
+-//          }
+-          )
+-        .withUserObject(this)
+-        .getAllDriveData();
+ 
++  /** 
++    * [TODO] Send the value to the server and handle the response.
++    * 
++    * For @example:
++    * 
++    *  @function handleFormSubmit(
++    *  @params formObject 
++    *  @runs google.script.run.withSuccessHandler(updateUrl).processForm(formObject);
++    *  @returns urlString
++    * 
++    *  @function updateUrl
++    *  @params urlString 
++    *  @runs document.getElementById('output').innerHTML = '<a href="' + urlString + '">Got it!</a>';
++    * */ 
++  google.script.run
++      .withSuccessHandler()
++      .withFailureHandler()
++      .withUserObject(this)
++      .getAllDriveData();
++
++  function(msg, element) {
++    // Respond to success conditions here.
++    $('#sidebar-value').val(msg);
++    showStatus('Pulled value successfully.');
++    element.disabled = true;
+   }
+ 
++}
++
+   /**
+    * Displays the given status message in the sidebar.
+    *
+commit 2470965e339fd9c97c9b2a65bf8b51d73f914733
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Sat Jun 1 20:51:56 2019 -0700
+
+    [WIP] Cleaning 'uploadBar' and 'uploadBarJS'
+
+commit 30e68db2b94386dd3acc6876a31a7db49e15b0d0
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Sat Jun 1 16:55:51 2019 -0700
+
+    [WIP] Cleaning 'uploadBar' and 'uploadBarJS'
+
+commit 9c147efc51f7c7c645d0bc1519ef8ad11c8a2458
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Sat Jun 1 16:20:42 2019 -0700
+
+    [WIP] Building Testing Framework: Creating Methods
+
+commit 74c4b7dc5b14b1e8d887a1e11538b9480be560d2
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Mon May 27 15:39:04 2019 -0700
+
+    [WIP] Building Testing Framework: Dice Roll
+
+commit 53421a915d13e335428410583b5f2d99ee8eee0b
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Sun May 26 21:48:50 2019 -0700
+
+    [WIP] Building Testing Framework: Dice
+
+commit 37b4c6bb4bf6de1e67d03ce4303e8e191df606c6
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Thu May 23 23:42:10 2019 -0700
+
+    [WIP] Building Testing Framework
+
+commit 2eb503ca28ad9dca4008e682a2a52d0e6d84f8f4
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Thu May 23 07:35:25 2019 -0700
+
+    Fixed Linting Errors
+
+commit c9fd575ce5dfb78bd40a6335fd53499aebac93a4
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Thu May 23 01:16:58 2019 -0700
+
+    [WIP] Driveapp_webhook; Testing Framework
+
+commit 7b275703d318a0015e8a7fc4f20c0af290e22f7d
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Tue May 14 22:01:19 2019 -0700
+
+    [WIP] Header Testing Suite
+
+commit 26af5abb8363a616c8837bc182ac793cb8163b4a
+Author: Henry Zorrilla <thmthmnky@gmail.com>
+Date:   Sat May 11 13:12:19 2019 -0700
+
+    Initial commit.
+
+commit fa42f190aad99b52928022c78c41a322e44c100b
+Author: Henry O Zorrilla <12237673+thMthMnky@users.noreply.github.com>
+Date:   Sat May 11 12:30:48 2019 -0700
+
+    Initial commit

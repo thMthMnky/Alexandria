@@ -42,6 +42,39 @@ function showUpLoadBar() {
   SpreadsheetApp.getUi().showSidebar(ui);
 }
 
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename)
+      .getContent();
+}
+
+// Prevent forms from submitting.
+function preventFormSubmit() {
+  var forms = document.querySelectorAll('form');
+  for (var i = 0; i < forms.length; i++) {
+    forms[i].addEventListener('submit', function(event) {
+      event.preventDefault();
+    });
+  }
+}
+/** 
+ * Global Variables
+ *
+ */
+var COLUMN_WIDTH = '16px';
+var ROW_HEIGHT = '32px';
+var PRIMARY_COLOR = '#8B0000'; // Dark Red: (139,0,0)
+var PRIMARY_FONT_COLOR = '#ffffff'; // White: (255,255,255)
+var SECONDARY_FONT_COLOR = '#0000000';
+var SECONDARY_COLOR = '#808080'; // Gray: (128,128,128)
+var TERNARYARY_COLOR = '#C0C0C0'; // Silver: (192,192,192)
+var SIDEDBAR_TITLE = 'Upload Data 2 Drive';
+var SIDEBAR_HEIGTH = '600';
+var SIDEBAR_WIDTH = '400';
+var HEADER_TEXT_HORZ_ALIGNMENT = 'center';
+var HEADER_TEXT_VERT_ALIGNMENT = 'middle';
+var HEADER_FONT_SIZE = 14;
+var HEADER_COMPONENT_PRIMARY_COLOR ='#e6b8af';
+var HEADER_COMPONENT_SECONDARY_COLOR ='#e6b8af';
 
 /**
  * Google book search volume model
@@ -594,7 +627,7 @@ function getAllDriveData(){
   }catch(e){
     Logger.log(e);
   }
-
+  
   function walk(folder, sep){
      // Get folder data
     var folderName = folder.getName();
