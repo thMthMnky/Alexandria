@@ -231,15 +231,15 @@ function Header(columns, opts){
   this.index =  Object.keys(this.columns);
   this.visible = true;
   
-  this.ss = opts && opts.ss ? opts.ss : SpreadsheetApp.getActiveSpreadsheet();
-  this.sheet = opts && opts.sheet ? opts.sheet: this.ss.getActiveSheet();
+  this.ss = null;
+  this.sheet =null;  
   this.row = opts && opts.start.row ? opts.start.row : 1;
   this.column = opts && opts.start.column ? opts.start.column : 1;
   this.width = opts && opts.width ? opts.width : 1; 
   
-  this.updatedBy = this.ss.getEditors();
+  this.updatedBy = "";
   this.updatedDate = Date.now();
-  this.updatedNum = this.ss.getLastRow();
+  this.updatedNum = "";
 } 
 
 Header.prototype.isEqualTo = function(obj){
@@ -250,13 +250,15 @@ Header.prototype.isEqualTo = function(obj){
       return acc && (obj[curr] == self[curr]);
     }, isSameHeader);
   }
-  return isSameHeaders;
+  return isSameHeader;
 };
 
 /* Render new header on current active sheet */ 
-Header.prototype.render = function(){ 
+Header.prototype.render = function(opts){ 
   var self = this;
-
+  self.ss =  opts && opts.ss ? opts.ss : SpreadsheetApp.getActiveSpreadsheet();
+  self.sheet = opts && opts.sheet ? opts.sheet: this.ss.getActiveSheet();
+    
   function emptyStringArrayOfLength(num){
     var arr = [];
     while(arr.length < num) arr.push("");
@@ -264,21 +266,30 @@ Header.prototype.render = function(){
   }
 
   var _header_rows = [self.index];
-  while(_header_rows.length < self.width)_header_rows.push(emptyStringArrayOfLength(self.index.length));
-  _header_rows.reverse();
-  var _header = [self.sheet.getRange(self.row, self.column, _header_rows.length, self.index.length), _header_rows];
   
-  _header
+  while(_header_rows.length < self.width){
+    _header_rows.push(emptyStringArrayOfLength(self.index.length));
+  }
+  
+  _header_rows.reverse();
+  
+  var _header = [
+    self.sheet.getRange(self.row, self.column, _header_rows.length, self.index.length), 
+    _header_rows
+  ];
+  
+  // [TODO] Create a function to handle these background settings
+  _header[0]
   .setBackground(PRIMARY_COLOR) 
   .setFontColor(PRIMARY_FONT_COLOR)
   .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
   .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
   .setFontSize(HEADER_FONT_SIZE)// 14
-  .setValues(_header_rows);
+  .setValues(_header[1]);
 
   var _header_metadata = {};
-  _header_metadata.fields = [SpreadsheetApp.getActiveSheet().getRange(self.row + 1, self.column + 1, 3, 1), ['By:', 'Date:', '\#\{Entries\}']];
-  _header_metadata.values = [SpreadsheetApp.getActiveSheet().getRange(self.row + 1, self.column + 2, 3, 1), [self.updatedBy, self.updatedDate, self.updatedNum]];
+  _header_metadata.fields = [self.sheet.getRange(self.row + 1, self.column + 1, 3, 1), [['By:'], ['Date:'], ['\#\{Entries\}']]];
+  _header_metadata.values = [self.sheet.getRange(self.row + 1, self.column + 2, 3, 1), [[self.updatedBy], [self.updatedDate], [self.updatedNum]]];
   
   _header_metadata.fields[0]
   .setBackground(HEADER_COMPONENT_PRIMARY_COLOR)
@@ -286,7 +297,7 @@ Header.prototype.render = function(){
   .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
   .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
   .setFontSize(HEADER_FONT_SIZE)// 14
-  .setValues(update_component.fields[1]);
+  .setValues(_header_metadata.fields[1]);
 
   _header_metadata.values[0]
   .setBackground(HEADER_COMPONENT_SECONDARY_COLOR)
@@ -294,7 +305,7 @@ Header.prototype.render = function(){
   .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
   .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
   .setFontSize(HEADER_FONT_SIZE)// 14
-  .setValues(update_component.values[1]);
+  .setValues(_header_metadata.values[1]);
 };
 
 /* Shift the header X units to the right */ 
@@ -335,10 +346,30 @@ Header.prototype.update = function(){};
  * Test for 'makeHeader'
  */
 function testHeader(){
-  var result = true;
   var candidates = [];
+  var tests = []; 
+  var fails = []; 
+
+  function getFuncName() {
+    return getFuncName.caller.name;
+  }
   
-  function getTests(str     ){
+  function getRandomTest(){
+    
+    // Test-object model
+    var testModel = {
+      vols: null,
+      opts: {
+        ss: null,
+        sheet: null,
+        start:{
+          row: null,
+          col: null,
+        },
+        width: null
+      }  
+    };
+    
     // Common initialization values
     var Opts = [null, "", [], {} ];
     
@@ -352,47 +383,48 @@ function testHeader(){
       Opts.concat([NaN, -2, 0, 7]) 
     ];
 
-    // Test object model
-    var params = {
-      vols: null,
-      opts: {
-        ss: null,
-        sheet: null,
-        start:{
-          row: null,
-          col: null,
-        },
-        width: null
-      }  
-    };
-
-    // Get a random number
+    // Given an arbitrary positive integer, N, this function will return and randon integer in the interval [0,N) 
     var randInt = function(N) { return Math.floor(N*Math.random()); };
 
     // Roll the dice
-    params.vols = dice[0][randInt(dice[0].length)];
-    params.Opts.ss = dice[1][randInt(dice[1].length)];
-    params.Opts.sheet = dice[2][randInt(dice[2].length)];
-    params.Opts.start.row = dice[3][randInt(dice[3].length)];
-    params.Opts.start.col = dice[4][randInt(dice[4].length)];
-    params.Opts.width = dice[5][randInt(dice[5].length)];
+    testModel.vols = dice[0][randInt(dice[0].length)];
+    testModel.opts.ss = dice[1][randInt(dice[1].length)];
+    testModel.opts.sheet = dice[2][randInt(dice[2].length)];
+    testModel.opts.start.row = dice[3][randInt(dice[3].length)];
+    testModel.opts.start.col = dice[4][randInt(dice[4].length)];
+    testModel.opts.width = dice[5][randInt(dice[5].length)];
 
-    return params;
+    return testModel;
   }
   
   function before(){
+      /** 
+       * [TODO] Create a sheet in which to run the tests 
+       * 
+       * "Before I begin runnning the tests, I will create "
+       * */ 
     try{
-      sheet.getRange(row, column, numRows, numColumns).clearContent();
-      tests = getTests();
+      SpreadsheetApp.getActiveSheet().clear();
     }catch(e){
       Logger.log(e);
     }
   }
+  /** 
+   * [TODO] 
+   * 
+   * 
+   * */
   function beforeEach(current_idx){
-      
-      books = Columns(gVol, " ", 0);
-    candidates.push(new Header(books, tests[current_idx].opts));
-    Logger.log('test'+current_idx);
+    tests[current_idx] = getRandomTest();
+
+    try{
+      headings = Columns(tests[current_idx].vols, " ", 0);
+      options = tests[current_idx].opts;
+      candidates.push(new Header(headings, options));
+    }catch(e){
+      fails.push("Failed " + beforeEach + " @ index " + current_idx  + " with error: " + e);
+      Logger.log(e);
+    }
   }
 
   /**
@@ -400,27 +432,42 @@ function testHeader(){
    * 
    * "For the candidate at position @current_idx , "
    * */
-  function run(current_idx){
-    var ththingreturning = true;
-
-
-    Logger.log(ththingreturning);
-    return ththingreturning;
-  }
-  function afterEach(current_idx){
-    headers[current_idx].render();
+  function testing(current_idx){
+    var testResults = true;
+    try{
+     testResults = candidates[current_idx].isEqualTo(candidates[current_idx -1]);
+    }catch(e){
+      fails.push("Failed " + testing + " @ index " + current_idx  + " with error: " + e);
+      Logger.log(e);
+    }
+    Logger.log(testResults);
+    return testResults;
   }
   
-  function Result(){
+  function afterEach(current_idx){
+    try{
+      candidates[current_idx].render();
+    }catch(e){
+      fails.push("Failed " + afterEach.name + " @ index " + current_idx  + " with error: " + e);
+      Logger.log(e);
+    }
+  }
+  
+  function after(){}
+  
+  function RunTheTests(){
+    var passedAll = true;
     before();
-    for(var i = 0; i < tests.length; i++){
+    for(var i = 0; i < 7; i++){
       beforeEach(i);
-      result = result && run(i);
+      passedAll = passedAll && testing(i);
       afterEach(i);
     }
     after();
+    return passedAll;
   }
-  return Result();
+  
+  return RunTheTests();
 }
 
 function getAllDriveData(){
@@ -431,8 +478,11 @@ function getAllDriveData(){
   var allFolders = {};
   
   function walk(folder, sep){
+    // Get folder data
     var folderName = folder.getName();
     var files = folder.getFiles();
+
+
     while(files.hasNext()){
       var file = files.next();
       var fileId = file.getId();
