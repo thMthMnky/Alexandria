@@ -3,6 +3,30 @@
   <head>
     <base target="_top">
     <?!= HtmlService.createHtmlOutputFromFile('Stylesheet').getContent(); ?>
+    <script>
+      /** [DEP] Keep until the button populates the Active Spreadsheet */
+      // // Prevent forms from submitting.
+      // function preventFormSubmit() {
+      //   var forms = document.querySelectorAll('form');
+      //   for (var i = 0; i < forms.length; i++) {
+      //     forms[i].addEventListener('submit', function(event) {
+      //       event.preventDefault();
+      //     });
+      //   }
+      // }
+      
+      window.addEventListener('load', preventFormSubmit);
+      
+      /** [DEP] Keep until the button populates the Active Spreadsheet */
+      // function handleFormSubmit(formObject) {
+      //   google.script.run.withSuccessHandler(updateUrl).processForm(formObject);
+      // }
+      // function updateUrl(url) {
+      //   var div = document.getElementById('output');
+      //   div.innerHTML = '<a href="' + url + '">Got it!</a>';
+      // }
+
+    </script>
   </head>
   <body>
     <div class="sidebar branding-below">
@@ -20,6 +44,12 @@
 
       <div id="sidebar-status"></div>
       
+      <!-- [DEP] Keep until the button populates the Active Spreadsheet -->
+      <!-- <form id="myForm" onsubmit="handleFormSubmit(this)">
+        <input name="myFile" type="file" />
+        <input type="submit" value="Submit" />
+      </form>
+      <div id="output"></div> -->
     </div>
 
     <!-- Use a templated HTML printing scriptlet to import JavaScript. -->
