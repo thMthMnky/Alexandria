@@ -11,13 +11,14 @@ var SECONDARY_FONT_COLOR = '#0000000';
 var SECONDARY_COLOR = '#808080'; // Gray: (128,128,128)
 var TERNARYARY_COLOR = '#C0C0C0'; // Silver: (192,192,192)
 var SIDEDBAR_TITLE = 'Upload Data 2 Drive';
-var SIDEBAR_HEIGTH = '600';
-var SIDEBAR_WIDTH = '400';
+var SIDEBAR_HEIGTH = '600px';
+var SIDEBAR_WIDTH = '400px';
 var HEADER_TEXT_HORZ_ALIGNMENT = 'center';
 var HEADER_TEXT_VERT_ALIGNMENT = 'middle';
-var HEADER_FONT_SIZE = 14;
 var HEADER_COMPONENT_PRIMARY_COLOR ='#e6b8af';
 var HEADER_COMPONENT_SECONDARY_COLOR ='#e6b8af';
+var HEADER_FONT_SIZE = 14;
+
 /**
  * Adds a custom menu with items to show the sidebar and dialog.
  *
@@ -26,9 +27,11 @@ var HEADER_COMPONENT_SECONDARY_COLOR ='#e6b8af';
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui 
-  .createAddonMenu()
+  .createMenu()
   .addItem('GetDriveData', 'showUpLoadBar')
   .addToUi();
+  
+  showUploadBar();
 }
 
 /**
@@ -257,7 +260,7 @@ Header.prototype.isEqualTo = function(obj){
 Header.prototype.render = function(opts){ 
   var self = this;
   self.ss =  opts && opts.ss ? opts.ss : SpreadsheetApp.getActiveSpreadsheet();
-  self.sheet = opts && opts.sheet ? opts.sheet: this.ss.getActiveSheet();
+  self.sheet = opts && opts.sheet ? opts.sheet: self.ss.getActiveSheet();
     
   function emptyStringArrayOfLength(num){
     var arr = [];
@@ -266,46 +269,53 @@ Header.prototype.render = function(opts){
   }
 
   var _header_rows = [self.index];
-  
   while(_header_rows.length < self.width){
     _header_rows.push(emptyStringArrayOfLength(self.index.length));
   }
-  
   _header_rows.reverse();
   
-  var _header = [
-    self.sheet.getRange(self.row, self.column, _header_rows.length, self.index.length), 
-    _header_rows
-  ];
-  
-  // [TODO] Create a function to handle these background settings
-  _header[0]
-  .setBackground(PRIMARY_COLOR) 
-  .setFontColor(PRIMARY_FONT_COLOR)
-  .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
-  .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
-  .setFontSize(HEADER_FONT_SIZE)// 14
-  .setValues(_header[1]);
-
   var _header_metadata = {};
-  _header_metadata.fields = [self.sheet.getRange(self.row + 1, self.column + 1, 3, 1), [['By:'], ['Date:'], ['\#\{Entries\}']]];
-  _header_metadata.values = [self.sheet.getRange(self.row + 1, self.column + 2, 3, 1), [[self.updatedBy], [self.updatedDate], [self.updatedNum]]];
+  var components = [{
+    name: "main",
+    range: (function (){ return self.sheet.getRange(self.row, self.column, self.width, self.index.length); })(),
+    values: _header_rows,
+    background: PRIMARY_COLOR,
+    fColor: PRIMARY_FONT_COLOR,
+    fHorz: HEADER_TEXT_HORZ_ALIGNMENT,
+    fVert: HEADER_TEXT_VERT_ALIGNMENT,
+    fSize: HEADER_FONT_SIZE
+  },
+  {
+    name: "componentFields",
+    range: self.sheet.getRange(self.row + 1, self.column + 1, 3, 1),
+    values: [['By:'], ['Date:'], ['\#\{Entries\}']],
+    background: HEADER_COMPONENT_PRIMARY_COLOR,
+    fColor: PRIMARY_FONT_COLOR,
+    fHorz: HEADER_TEXT_HORZ_ALIGNMENT,
+    fVert: HEADER_TEXT_VERT_ALIGNMENT,
+    fSize: HEADER_FONT_SIZE
+  },
+  {
+    name: "compoenentValues",
+    range: self.sheet.getRange(self.row + 1, self.column + 2, 3, 1),
+    values: [[self.updatedBy], [self.updatedDate], [self.updatedNum]],
+    background: HEADER_COMPONENT_SECONDARY_COLOR,
+    fColor: SECONDARY_FONT_COLOR,
+    fHorz: HEADER_TEXT_HORZ_ALIGNMENT,
+    fVert: HEADER_TEXT_VERT_ALIGNMENT,
+    fSize: HEADER_FONT_SIZE
+  }];
   
-  _header_metadata.fields[0]
-  .setBackground(HEADER_COMPONENT_PRIMARY_COLOR)
-  .setFontColor(PRIMARY_FONT_COLOR)
-  .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
-  .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
-  .setFontSize(HEADER_FONT_SIZE)// 14
-  .setValues(_header_metadata.fields[1]);
-
-  _header_metadata.values[0]
-  .setBackground(HEADER_COMPONENT_SECONDARY_COLOR)
-  .setFontColor(SECONDARY_FONT_COLOR)
-  .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
-  .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
-  .setFontSize(HEADER_FONT_SIZE)// 14
-  .setValues(_header_metadata.values[1]);
+  function _render(type, range, values, background, fColor, fHorz, fVert, fSize){
+    range
+    .setBackground(background) 
+    .setFontColor(fColor)
+    .setHorizontalAlignment(fHorz)// 'center'
+    .setVerticalAlignment(fVert)// 'middle'
+    .setFontSize(fSize)// 14
+    .setValues(values);
+  }
+  _render(components[0].name, components[0].range(), components[0].values, components[0].background, components[0].fColor, components[0].fHorz, components[0].fVert, components[0].fSize );
 };
 
 /* Shift the header X units to the right */ 
