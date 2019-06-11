@@ -405,9 +405,15 @@ function testHeader(){
   function getFuncName() {
     return getFuncName.caller.name;
   }
+<<<<<<< HEAD
 
   function getTest(testId){
     var defaultTestId = [4, 4, 5, 0, 0];
+=======
+  
+  function getTest(params){
+    var testId = !!params? params: [];
+>>>>>>> [WIP] Building Testing Framework: TestApi Endpoints
 
     // Test-object model
     var testModel = {
@@ -423,6 +429,7 @@ function testHeader(){
       }
     };
 
+<<<<<<< HEAD
     var idx = {};
     idx.vol = 0;
     idx.ss = 1;
@@ -434,6 +441,11 @@ function testHeader(){
     // Given an arbitrary natuaral number, N, this function will return a 'random' second natuaral number in the interval [0,N) 
     var randNat = function(maxSize) { return Math.floor(maxSize*Math.random()); };
 
+=======
+    // Given an arbitrary positive integer, N, this function will return and randon integer in the interval [0,N) 
+    var randInt = function(N) { return Math.floor(N*Math.random()); };
+    
+>>>>>>> [WIP] Building Testing Framework: TestApi Endpoints
     // Common initialization values
     var Opts = [null, "", [], {} ];
 
@@ -442,21 +454,31 @@ function testHeader(){
       Opts.concat([gVol]),
       Opts.concat([SpreadsheetApp.getActiveSpreadsheet()]),
       Opts.concat([SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(), SpreadsheetApp.getActiveSheet()]),
-      Opts.concat([NaN, -6, 0, 3]),
-      Opts.concat([NaN, -2, 0, 7]),
-      Opts.concat([NaN, -2, 0, 7]) 
+      Opts.concat([NaN, 0, randInt(N), -1*randInt(N)]),
+      Opts.concat([NaN, 0, randInt(N), -1*randInt(N)]),
+      Opts.concat([NaN, 0, randInt(N), -1*randInt(N)]) 
     ];
 
-    // Given an arbitrary positive integer, N, this function will return and randon integer in the interval [0,N) 
-    var randInt = function(N) { return Math.floor(N*Math.random()); };
+    if( testId.constructor.name != "Array" || testId === [] || testId === null){
 
-    // Roll the dice
-    testModel.vols = dice[0][randInt(dice[0].length)];
-    testModel.opts.ss = dice[1][randInt(dice[1].length)];
-    testModel.opts.sheet = dice[2][randInt(dice[2].length)];
-    testModel.opts.start.row = dice[3][randInt(dice[3].length)];
-    testModel.opts.start.col = dice[4][randInt(dice[4].length)];
-    testModel.opts.width = dice[5][randInt(dice[5].length)];
+      // Roll the dice
+      testModel.vols = dice[0][ randInt( dice[0].length )];
+      testModel.opts.ss = dice[1][ randInt( dice[1].length )];
+      testModel.opts.sheet = dice[2][ randInt( dice[2].length )];
+      testModel.opts.start.row = dice[3][ randInt( dice[3].length )];
+      testModel.opts.start.col = dice[4][ randInt( dice[4].length )];
+      testModel.opts.width = dice[5][ randInt( dice[5].length )];
+      
+    }else{
+
+      // Accept correct params or Set 'safe' defaults
+      testModel.vols = !!tesId[0] ? dice[0][ testId[0] ] : dice[0][4];
+      testModel.opts.ss = !!tesId[1] ? dice[1][ testId[1]] : dice[1][4];
+      testModel.opts.sheet = !!tesId[2] ? dice[2][ testId[2]] : dice[2][5];
+      testModel.opts.start.row = !!tesId[3] ? dice[3][ testId[3]] : dice[3][0];
+      testModel.opts.start.col = !!tesId[4] ? dice[4][ testId[4]] : dice[4][0];
+      testModel.opts.width = !!tesId[5] ? dice[5][ testId[5]] : dice[5][0];
+    }
 
     /** [DEP] Keep until we confirm the corresponding section is confirmed to have worked as intended*/ 
 
@@ -492,10 +514,17 @@ function testHeader(){
     }
   }
 
+<<<<<<< HEAD
   /**
    * [TODO]
    *
    *
+=======
+  /** 
+   * [TODO] 
+   * 
+   * 
+>>>>>>> [WIP] Building Testing Framework: TestApi Endpoints
    * */
   function beforeEach(current_idx){
     tests[current_idx] = getRandomTest();
@@ -505,7 +534,7 @@ function testHeader(){
       options = tests[current_idx].opts;
       candidates.push(new Header(headings, options));
     }catch(e){
-      fails.push("Failed " + beforeEach + " @ index " + current_idx  + " with error: " + e);
+      fails.push("Failed " + beforeEach.name + " @ index " + current_idx  + " with error: " + e);
       Logger.log(e);
     }
   }
@@ -515,12 +544,12 @@ function testHeader(){
    *
    * "For the candidate at position @current_idx , "
    * */
-  function testing(current_idx){
+  function testingRender(current_idx){
     var testResults = true;
     try{
      testResults = candidates[current_idx].isEqualTo(candidates[current_idx -1]);
     }catch(e){
-      fails.push("Failed " + testing + " @ index " + current_idx  + " with error: " + e);
+      fails.push("Failed " + testing.name + " @ index " + current_idx  + " with error: " + e);
       Logger.log(e);
     }
     Logger.log(testResults);
@@ -543,7 +572,7 @@ function testHeader(){
     before();
     for(var i = 0; i < 7; i++){
       beforeEach(i);
-      passedAll = passedAll && testing(i);
+      passedAll = passedAll && testingRender(i);
       afterEach(i);
     }
     after();
