@@ -12,7 +12,7 @@
   });
 
   /**
-   * Calls the server to retrieve information from the sheet.
+    * Calls the server to retrieve information from the sheet.
    * Gets the value in the active cell, which is then placed in the
    * sidebar text field.
    */
@@ -38,23 +38,42 @@
     });
     Logger.log(folders);
    }
-    // Send the value to the server and handle the response.
+    /** 
+     * [TODO] Send the value to the server and handle the response.
+     * 
+     * For @example:
+     * 
+     *          @function handleFormSubmit(
+     *            @params formObject 
+     *            @runs google.script.run.withSuccessHandler(updateUrl).processForm(formObject);
+     *            @returns urlString
+     * 
+     *           @function updateUrl
+     *             @params urlString 
+     *             @runs {
+     *               var div = document.getElementById('output');
+     *               div.innerHTML = '<a href="' + urlString + '">Got it!</a>';
+     *             } 
+     * */ 
     google.script.run
         .withSuccessHandler(
-          function(msg, element) {
-            // Respond to success conditions here.
-            $('#sidebar-value').val(msg);
-            showStatus('Pulled value successfully.');
-            element.disabled = false;
-          })
+//          function(msg, element) {
+//            // Respond to success conditions here.
+//            $('#sidebar-value').val(msg);
+//            showStatus('Pulled value successfully.');
+//            element.disabled = true;
+//          }
+          )
         .withFailureHandler(
-          function(msg, element) {
-            // Respond to failure conditions here.
-            showStatus(msg, 'error');
-            element.disabled = false;
-          })
+//          function(msg, element) {
+//            // Respond to failure conditions here.
+//            showStatus(msg, 'error');
+//            element.disabled = false;
+//          }
+          )
         .withUserObject(this)
-        .getActiveValue();
+        .getAllDriveData();
+
   }
 
   /**
