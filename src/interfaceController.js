@@ -382,20 +382,21 @@ Header.prototype.update = function(){};
  * Test for 'makeHeader'
  */
 function testHeader(){
+  var dice = {};
+  var tests = {}; 
   var candidates = [];
-  var tests = []; 
   var fails = []; 
 
   function getFuncName() {
     return getFuncName.caller.name;
   }
   
-  function getTest(params){
-    var testId = !!params? params: [];
+  function getTest(testId){
+    var defaultTestIds = [4, 4, 5, 0, 0];
 
     // Test-object model
     var testModel = {
-      vols: null,
+      vol: null,
       opts: {
         ss: null,
         sheet: null,
@@ -404,46 +405,68 @@ function testHeader(){
           col: null,
         },
         width: null
-      }  
+      }
     };
 
-    // Given an arbitrary positive integer, N, this function will return and randon integer in the interval [0,N) 
-    var randInt = function(N) { return Math.floor(N*Math.random()); };
+    var idx = {};
+    idx.vol = 0;
+    idx.ss = 1;
+    idx.sheet = 2;
+    idx.row = 3;
+    idx.col = 4;
+    idx.width = 5;
+
+    // Given an arbitrary natuaral number, N, this function will return a 'random' second natuaral number in the interval [0,N) 
+    var randNat = function(maxSize) { return Math.floor(maxSize*Math.random()); };
     
     // Common initialization values
     var Opts = [null, "", [], {} ];
 
     // Create a die
-    var dice = [
-      Opts.concat([gVol]),
-      Opts.concat([SpreadsheetApp.getActiveSpreadsheet()]),
-      Opts.concat([SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(), SpreadsheetApp.getActiveSheet()]),
-      Opts.concat([NaN, 0, randInt(N), -1*randInt(N)]),
-      Opts.concat([NaN, 0, randInt(N), -1*randInt(N)]),
-      Opts.concat([NaN, 0, randInt(N), -1*randInt(N)]) 
-    ];
-
-    if( testId.constructor.name != "Array" || testId === [] || testId === null){
-
-      // Roll the dice
-      testModel.vols = dice[0][ randInt( dice[0].length )];
-      testModel.opts.ss = dice[1][ randInt( dice[1].length )];
-      testModel.opts.sheet = dice[2][ randInt( dice[2].length )];
-      testModel.opts.start.row = dice[3][ randInt( dice[3].length )];
-      testModel.opts.start.col = dice[4][ randInt( dice[4].length )];
-      testModel.opts.width = dice[5][ randInt( dice[5].length )];
-      
-    }else{
-
-      // Accept correct params or Set 'safe' defaults
-      testModel.vols = !!tesId[0] ? dice[0][ testId[0] ] : dice[0][4];
-      testModel.opts.ss = !!tesId[1] ? dice[1][ testId[1]] : dice[1][4];
-      testModel.opts.sheet = !!tesId[2] ? dice[2][ testId[2]] : dice[2][5];
-      testModel.opts.start.row = !!tesId[3] ? dice[3][ testId[3]] : dice[3][0];
-      testModel.opts.start.col = !!tesId[4] ? dice[4][ testId[4]] : dice[4][0];
-      testModel.opts.width = !!tesId[5] ? dice[5][ testId[5]] : dice[5][0];
+    dice.vol = Opts.concat([gVol]);
+    try{
+      dice.ss = Opts.concat([SpreadsheetApp.getActiveSpreadsheet()]);
+    }catch(e){
+      fails.push(e);
+      Logger.log(e);
     }
 
+    try{
+      dice.sheet = Opts.concat([dice.ss[4].getActiveSheet(), SpreadsheetApp.getActiveSheet()]);
+    }catch(e){
+      fails.push(e);
+      Logger.log(e);
+    }
+    dice.row = Opts.concat([NaN, 0, randNat(10), -1*randNat(8)]);
+    dice.col = Opts.concat([NaN, 0, randNat(9), -1*randNat(11)]);
+    dice.width = Opts.concat([NaN, 0, randNat(3), -1*randNat(5)]);
+
+    // Set the index based on 'testId' parameters
+    var isValidTestId = testId.constructor.name != "Array" || testId === null;
+    var Idx = Object.keys(idx);
+    Idx.forEach(function(VAL){
+      var testIdx = Idx.indexof(VAL);
+      idx[VAL] = !isValidTestId ? randNat( dice[VAL].length ) : !!tesId[testIdx] && typeof testId[testIdx] == "number" ? testId[testIdx] : defaultTestIds[testIdx];
+    });
+
+    /** [DEP] Keep until we confirm the corresponding section is confirmed to work */ 
+
+    // // Set the index based on 'testId' parameters
+    // vols_Idx = !isValidTestId ? randNat( dice.vol.length ) : !!tesId[0] && typeof testId[0] == "number" ? testId[0] : 4;
+    // ss_Idx = !isValidTestId ? randNat( dice.ss.length ) : !!tesId[1]  && typeof testId[1] == "number" ? testId[1] : 4 ;
+    // sheet_Idx = !isValidTestId ? randNat( dice.sheet.length ) : !!tesId[2]  && typeof testId[2] == "number" ? testId[2] : 5;
+    // row_Idx = !isValidTestId ? randNat( dice.row.length ) : !!tesId[3]  && typeof testId[3] == "number" ? testId[3] : 0;
+    // col_Idx = !isValidTestId ? randNat( dice.col.length ) : !!tesId[4]  && typeof testId[4] == "number" ? testId[4] : 0;
+    // width_Idx = !isValidTestId ? randNat( dice.width.length ) : !!tesId[5]  && typeof testId[5] == "number" ? testId[5] : 0;
+
+    // Accept correct params or Set 'safe' defaults
+    testModel.vols = dice.vol[ idx.vol ];
+    testModel.opts.ss = dice.ss[ idx.ss ];
+    testModel.opts.sheet = dice.sheet[ idx.sheet ];
+    testModel.opts.start.row = dice.row[ idx.row ];
+    testModel.opts.start.col = dice.col[ idx.col ];
+    testModel.opts.width = dice.width[ idx.width ];
+    
     return testModel;
   }
   
@@ -454,7 +477,13 @@ function testHeader(){
        * "Before I begin runnning the tests, I will create "
        * */ 
     try{
-      SpreadsheetApp.getActiveSheet().clear();
+      // Getting the Active SpreadSheet
+      SpreadsheetApp.getActiveSpreadsheet();
+
+      // Create a new sheet
+
+      // Create 
+    tests[current_idx] = getTest([null, null, null, ]);
     }catch(e){
       Logger.log(e);
     }
@@ -466,7 +495,6 @@ function testHeader(){
    * 
    * */
   function beforeEach(current_idx){
-    tests[current_idx] = getRandomTest();
 
     try{
       headings = Columns(tests[current_idx].vols, " ", 0);
@@ -534,10 +562,9 @@ function getAllDriveData(){
   }
   
   function walk(folder, sep){
-    // Get folder data
+     // Get folder data
     var folderName = folder.getName();
     var files = folder.getFiles();
-
 
     while(files.hasNext()){
       var file = files.next();
