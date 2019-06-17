@@ -592,14 +592,14 @@ function testHeader(){
       dice.ss = Opts.concat([SpreadsheetApp.getActiveSpreadsheet()]);
     }catch(e){
       fails.push(e);
-      Logger.log(e);
+      // Logger.log(e);
     }
 
     try{
       dice.sheet = Opts.concat([dice.ss[4].getActiveSheet(), SpreadsheetApp.getActiveSheet()]);
     }catch(e){
       fails.push(e);
-      Logger.log(e);
+      // Logger.log(e);
     }
     dice.row = Opts.concat([NaN, 0, randNat(10), -1*randNat(8)]);
     dice.col = Opts.concat([NaN, 0, randNat(9), -1*randNat(11)]);
@@ -610,6 +610,7 @@ function testHeader(){
     var isValidTestId = testId.constructor.name != "Array" || testId === null;
     var Idx = Object.keys(idx);
     Idx.forEach(function(VAL){
+<<<<<<< HEAD
 <<<<<<< HEAD
       Logger.log(VAL);
 
@@ -626,11 +627,20 @@ function testHeader(){
 >>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
 =======
       var testIdx = Idx.indexof(VAL);
+=======
+      Logger.log(VAL);
+      var testIdx = Idx.indexOf(VAL, 0)
+>>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
       idx[VAL] = !isValidTestId ? randNat( dice[VAL].length ) : !!tesId[testIdx] && typeof testId[testIdx] == "number" ? testId[testIdx] : defaultTestIds[testIdx];
+      Logger.log(idx[VAL]);
     });
 
+<<<<<<< HEAD
     /** [DEP] Keep until we confirm the corresponding section is confirmed to work */ 
 >>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
+=======
+    /** [DEP] Keep until we confirm the corresponding section is confirmed to have worked as intended*/ 
+>>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
 
     // // Set the index based on 'testId' parameters
     // vols_Idx = !isValidTestId ? randNat( dice.vol.length ) : !!tesId[0] && typeof testId[0] == "number" ? testId[0] : 4;
@@ -689,11 +699,16 @@ function testHeader(){
 
       // Create a new sheet
 
+<<<<<<< HEAD
       // Create 
     tests[current_idx] = getTest([null, null, null, ]);
 >>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
     }catch(e){
        Logger.log("There was an error in the before function. The following error was thrown: "+e);
+=======
+    }catch(e){
+      // Logger.log(e);
+>>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
     }
   }
 
@@ -714,17 +729,25 @@ function testHeader(){
 >>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
   function beforeEach(current_idx){
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     tests[current_idx] = getTest([null, null, null, ]);
 =======
 >>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
 
+=======
+    tests[current_idx] = getTest([null, null, null, ]);
+>>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
     try{
       headings = Columns(tests[current_idx].vols, "__t ${ current_idx } t__", 0);
       options = tests[current_idx].opts;
       candidates.push(new Header(headings, options));
     }catch(e){
+<<<<<<< HEAD
       fails.push("Failed " + getFuncName() + " @ index " + current_idx  + " with error: " + e);
+=======
+      fails.push("Failed " + beforeEach.name + " @ index " + current_idx  + " with error: " + e);
+>>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
       // Logger.log(e)
     }
   }
@@ -743,8 +766,12 @@ function testHeader(){
      testResults = candidates[current_idx].render();
 	// this shoud simply test if the test was rendered
     }catch(e){
+<<<<<<< HEAD
       fails.push("Failed " + getFuncName() + " @ index " + current_idx  + " with error: " + e);
 
+=======
+      fails.push("Failed " + testingRender.name + " @ index " + current_idx  + " with error: " + e);
+>>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
       // Logger.log(e);
     }
     Logger.log(testResults);
@@ -763,7 +790,11 @@ function testHeader(){
     try{
       candidates[current_idx].render();
     }catch(e){
+<<<<<<< HEAD
       fails.push("Failed " + getFuncName() + " @ index " + current_idx  + " with error: " + e);
+=======
+      fails.push("Failed " + afterEach.name + " @ index " + current_idx  + " with error: " + e);
+>>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
       // Logger.log(e);
     }
   }
