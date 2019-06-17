@@ -441,6 +441,7 @@ Header.prototype.update = function(){};
 function testHeader(){
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
   var dice = {};
   var tests = {};
@@ -448,6 +449,8 @@ function testHeader(){
   var tests = [];
   var fails = [];
 =======
+=======
+>>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
   var dice = {};
   var tests = {}; 
   var candidates = [];
@@ -470,6 +473,7 @@ function testHeader(){
 =======
   
 <<<<<<< HEAD
+<<<<<<< HEAD
   function getTest(params){
     var testId = !!params? params: [];
 >>>>>>> [WIP] Building Testing Framework: TestApi Endpoints
@@ -482,6 +486,10 @@ function testHeader(){
   function getTest(testId){
     var defaultTestIds = [4, 4, 5, 5, 5];
 >>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
+=======
+  function getTest(testId){
+    var defaultTestIds = [4, 4, 5, 0, 0];
+>>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
 
     // Test-object model
     var testModel = {
@@ -499,6 +507,9 @@ function testHeader(){
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
 =======
 >>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
     var idx = {};
@@ -510,6 +521,7 @@ function testHeader(){
     idx.width = 5;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     // Given an arbitrary natuaral number, N, this function will return a 'random' second natuaral number in the interval [0,N) 
     var randNat = function(maxSize) { return Math.floor(maxSize*Math.random()); };
 <<<<<<< HEAD
@@ -518,6 +530,10 @@ function testHeader(){
     // Given an arbitrary positive integer, N, this function will return and randon integer in the interval [0,N) 
     var randInt = function(N) { return Math.floor(N*Math.random()); };
 =======
+>>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
+=======
+    // Given an arbitrary natuaral number, N, this function will return a 'random' second natuaral number in the interval [0,N) 
+    var randNat = function(maxSize) { return Math.floor(maxSize*Math.random()); };
 >>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
     
 >>>>>>> [WIP] Building Testing Framework: TestApi Endpoints
@@ -558,6 +574,7 @@ function testHeader(){
         // Logger.log(e);
       }
 
+<<<<<<< HEAD
       try{
         dice.sheet = Opts.concat([dice.ss[4].getActiveSheet(), SpreadsheetApp.getActiveSheet()]);
       }catch(e){
@@ -568,10 +585,32 @@ function testHeader(){
       dice.col = Opts.concat([NaN, 0, randNat(9), -1*randNat(11)]);
       dice.width = Opts.concat([NaN, 0, randNat(3), -1*randNat(5)]);
     }
+=======
+    // Create a die
+    dice.vol = Opts.concat([gVol]);
+    try{
+      dice.ss = Opts.concat([SpreadsheetApp.getActiveSpreadsheet()]);
+    }catch(e){
+      fails.push(e);
+      Logger.log(e);
+    }
+
+    try{
+      dice.sheet = Opts.concat([dice.ss[4].getActiveSheet(), SpreadsheetApp.getActiveSheet()]);
+    }catch(e){
+      fails.push(e);
+      Logger.log(e);
+    }
+    dice.row = Opts.concat([NaN, 0, randNat(10), -1*randNat(8)]);
+    dice.col = Opts.concat([NaN, 0, randNat(9), -1*randNat(11)]);
+    dice.width = Opts.concat([NaN, 0, randNat(3), -1*randNat(5)]);
+
+>>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
     // Set the index based on 'testId' parameters
     var isValidTestId = testId.constructor.name != "Array" || testId === null;
     var Idx = Object.keys(idx);
     Idx.forEach(function(VAL){
+<<<<<<< HEAD
       Logger.log(VAL);
 
       var testIdx = Idx.indexOf(VAL, 0)
@@ -585,6 +624,13 @@ function testHeader(){
 =======
     /** [DEP] Keep until we confirm the corresponding section is confirmed to have worked as intended*/ 
 >>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
+=======
+      var testIdx = Idx.indexof(VAL);
+      idx[VAL] = !isValidTestId ? randNat( dice[VAL].length ) : !!tesId[testIdx] && typeof testId[testIdx] == "number" ? testId[testIdx] : defaultTestIds[testIdx];
+    });
+
+    /** [DEP] Keep until we confirm the corresponding section is confirmed to work */ 
+>>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
 
     // // Set the index based on 'testId' parameters
     // vols_Idx = !isValidTestId ? randNat( dice.vol.length ) : !!tesId[0] && typeof testId[0] == "number" ? testId[0] : 4;
@@ -594,14 +640,20 @@ function testHeader(){
     // col_Idx = !isValidTestId ? randNat( dice.col.length ) : !!tesId[4]  && typeof testId[4] == "number" ? testId[4] : 0;
     // width_Idx = !isValidTestId ? randNat( dice.width.length ) : !!tesId[5]  && typeof testId[5] == "number" ? testId[5] : 0;
 
+<<<<<<< HEAD
 
     // Accept correct params or Set 'safe' defaults
     testModel.vol = dice.vol[ idx.vol ];
+=======
+    // Accept correct params or Set 'safe' defaults
+    testModel.vols = dice.vol[ idx.vol ];
+>>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
     testModel.opts.ss = dice.ss[ idx.ss ];
     testModel.opts.sheet = dice.sheet[ idx.sheet ];
     testModel.opts.start.row = dice.row[ idx.row ];
     testModel.opts.start.col = dice.col[ idx.col ];
     testModel.opts.width = dice.width[ idx.width ];
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 
@@ -610,6 +662,9 @@ function testHeader(){
 >>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
 =======
 >>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
+=======
+    
+>>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
     return testModel;
   }
 
@@ -624,10 +679,19 @@ function testHeader(){
 >>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
     try{
       // Getting the Active SpreadSheet
+<<<<<<< HEAD
       Logger.log("In 'before' but it doesn't do anything just yet")
       tests[i] = getTest([null, null, null, 4, 5, 6]);
       // Create a new sheet
 
+=======
+      SpreadsheetApp.getActiveSpreadsheet();
+
+      // Create a new sheet
+
+      // Create 
+    tests[current_idx] = getTest([null, null, null, ]);
+>>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
     }catch(e){
        Logger.log("There was an error in the before function. The following error was thrown: "+e);
     }
@@ -649,8 +713,11 @@ function testHeader(){
 =======
 >>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
   function beforeEach(current_idx){
+<<<<<<< HEAD
 
     tests[current_idx] = getTest([null, null, null, ]);
+=======
+>>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
 
     try{
       headings = Columns(tests[current_idx].vols, "__t ${ current_idx } t__", 0);
