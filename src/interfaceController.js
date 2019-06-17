@@ -410,7 +410,7 @@ function testHeader(){
     var Idx = Object.keys(idx);
     Idx.forEach(function(VAL){
       Logger.log(VAL);
-      var testIdx = Idx.indexOf(VAL, 0)
+      var testIdx = Idx.indexOf(VAL, 0);
       idx[VAL] = !isValidTestId ? randNat( dice[VAL].length ) : !!tesId[testIdx] && typeof testId[testIdx] == "number" ? testId[testIdx] : defaultTestIds[testIdx];
       Logger.log(idx[VAL]);
     });
