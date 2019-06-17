@@ -392,14 +392,14 @@ function testHeader(){
       dice.ss = Opts.concat([SpreadsheetApp.getActiveSpreadsheet()]);
     }catch(e){
       fails.push(e);
-      Logger.log(e);
+      // Logger.log(e);
     }
 
     try{
       dice.sheet = Opts.concat([dice.ss[4].getActiveSheet(), SpreadsheetApp.getActiveSheet()]);
     }catch(e){
       fails.push(e);
-      Logger.log(e);
+      // Logger.log(e);
     }
     dice.row = Opts.concat([NaN, 0, randNat(10), -1*randNat(8)]);
     dice.col = Opts.concat([NaN, 0, randNat(9), -1*randNat(11)]);
@@ -409,11 +409,13 @@ function testHeader(){
     var isValidTestId = testId.constructor.name != "Array" || testId === null;
     var Idx = Object.keys(idx);
     Idx.forEach(function(VAL){
-      var testIdx = Idx.indexof(VAL);
+      Logger.log(VAL);
+      var testIdx = Idx.indexOf(VAL, 0)
       idx[VAL] = !isValidTestId ? randNat( dice[VAL].length ) : !!tesId[testIdx] && typeof testId[testIdx] == "number" ? testId[testIdx] : defaultTestIds[testIdx];
+      Logger.log(idx[VAL]);
     });
 
-    /** [DEP] Keep until we confirm the corresponding section is confirmed to work */ 
+    /** [DEP] Keep until we confirm the corresponding section is confirmed to have worked as intended*/ 
 
     // // Set the index based on 'testId' parameters
     // vols_Idx = !isValidTestId ? randNat( dice.vol.length ) : !!tesId[0] && typeof testId[0] == "number" ? testId[0] : 4;
@@ -446,10 +448,8 @@ function testHeader(){
 
       // Create a new sheet
 
-      // Create 
-    tests[current_idx] = getTest([null, null, null, ]);
     }catch(e){
-      Logger.log(e);
+      // Logger.log(e);
     }
   }
 
@@ -459,14 +459,14 @@ function testHeader(){
    * 
    * */
   function beforeEach(current_idx){
-
+    tests[current_idx] = getTest([null, null, null, ]);
     try{
       headings = Columns(tests[current_idx].vols, " ", 0);
       options = tests[current_idx].opts;
       candidates.push(new Header(headings, options));
     }catch(e){
       fails.push("Failed " + beforeEach.name + " @ index " + current_idx  + " with error: " + e);
-      Logger.log(e);
+      // Logger.log(e)
     }
   }
 
@@ -480,8 +480,8 @@ function testHeader(){
     try{
      testResults = candidates[current_idx].isEqualTo(candidates[current_idx -1]);
     }catch(e){
-      fails.push("Failed " + testing.name + " @ index " + current_idx  + " with error: " + e);
-      Logger.log(e);
+      fails.push("Failed " + testingRender.name + " @ index " + current_idx  + " with error: " + e);
+      // Logger.log(e);
     }
     Logger.log(testResults);
     return testResults;
@@ -492,7 +492,7 @@ function testHeader(){
       candidates[current_idx].render();
     }catch(e){
       fails.push("Failed " + afterEach.name + " @ index " + current_idx  + " with error: " + e);
-      Logger.log(e);
+      // Logger.log(e);
     }
   }
   
