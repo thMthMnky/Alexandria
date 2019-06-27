@@ -282,7 +282,6 @@ Header.prototype.isEqualTo = function(obj){
 Header.prototype.render = function(opts){
   var self = this;
   self.ss =  opts && opts.ss ? opts.ss : SpreadsheetApp.getActiveSpreadsheet();
-
   self.sheet = opts && opts.sheet ? opts.sheet : self.ss.getActiveSheet();
 
   function _render(type, range, values, background, fColor, fHorz, fVert, fSize){
@@ -302,6 +301,7 @@ Header.prototype.render = function(opts){
   }
 
   var _header_rows = [self.index];
+
   while(_header_rows.length < self.width){
     _header_rows.push(emptyStringArrayOfLength(self.index.length));
   }
@@ -569,7 +569,6 @@ function getAllDriveData(){
   // Log the name of every file in the user's Drive.
   var allFiles = {};
   var allFolders = {};
-
   var drive_root;
   try{
     drive_root = DriveApp.getRootFolder();
