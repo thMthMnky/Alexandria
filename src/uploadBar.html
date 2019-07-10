@@ -32,7 +32,11 @@
     <div class="sidebar branding-below">
       
       <p> This sidebar allows you to add either a folder or a file from Drive. </p>
-
+      <div>
+        <button type="button" id="gas_ss_get" onclick="getAllDriveData()">  </button>
+        <input>
+      </div>
+<!-- 
       <div class="block form-group" id="sidebar-value-block">
         <label for="sidebar-value">Sidebar value:</label>
         <input id="sidebar-value" value="37">
@@ -42,7 +46,7 @@
         <button id="sidebar-pull-button">Add Books</button>      
       </div>
 
-      <div id="sidebar-status"></div>
+      <div id="sidebar-status"></div> -->
       
       <!-- [DEP] Keep until the button populates the Active Spreadsheet -->
       <!-- <form id="myForm" onsubmit="handleFormSubmit(this)">
@@ -53,6 +57,5 @@
     </div>
 
     <!-- Use a templated HTML printing scriptlet to import JavaScript. -->
-    <?!= HtmlService.createHtmlOutputFromFile('uploadBarJS').getContent(); ?>
-  </body>
+    <?!= HtmlService.createHtmlOutputFromFile('uploadBarJS').getContent(); ?>  </body>
 </html>
