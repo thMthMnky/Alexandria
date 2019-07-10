@@ -339,7 +339,7 @@ Header.prototype.render = function(opts){
     fSize: HEADER_FONT_SIZE
   }];
 
-  for( var i = 0; i < components.length ){
+  for( var i = 0; i < components.length; i++ ){
    _render(components[i].name,
 	  components[i].range,
 	  components[i].values,
