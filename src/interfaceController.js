@@ -210,17 +210,16 @@ function Columns(obj, sep, idx){
  */
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
-
-  ui.createAddonMenu()
+  ui 
+  .createAddonMenu()
   .addItem('GetDriveData', 'showUpLoadBar')
   .addToUi();
 }
 
 /**
-* Opens a sidebar. The sidebar structure is described in the Sidebar.html
-* project file.
-*
-*/
+ * Opens a sidebar. The sidebar structure is described in the Sidebar.html
+ * project file.
+ */
 function showUpLoadBar() {
   var ui = HtmlService.createTemplateFromFile('uploadBar')
   .evaluate()
@@ -242,6 +241,22 @@ function preventFormSubmit() {
     });
   }
 }
+
+/**
+ * Displays an HTML-service dialog in Google Sheets that contains client-side
+ * JavaScript code for the Google Picker API.
+ */
+function showPicker() {
+  var html = HtmlService.createHtmlOutputFromFile('filePickerExample.html')
+      .setWidth(600)
+      .setHeight(425)
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+  SpreadsheetApp.getUi().showModalDialog(html, 'Select Folder');
+}
+
+/*************************************************************
+*                       * Main Functions *                   *
+**************************************************************/
 
 /**
  * Displays an HTML-service dialog in Google Sheets that contains client-side
@@ -637,42 +652,6 @@ function testHeader(){
   }
   
   return RunTheTests();
-}
-
-function getAllDriveData(){
-
-  // Log the name of every file in the user's Drive.
-  var allFiles = {};
-  var allFolders = {};
-  var drive_root;
-  try{
-    drive_root = DriveApp.getRootFolder();
-  }catch(e){
-    Logger.log(e);
-  }
-  
-  function walk(folder, sep){
-    // Get folder data
-    var folderName = folder.getName();
-    var files = folder.getFiles();
-
-
-    while(files.hasNext()){
-      var file = files.next();
-      var fileId = file.getId();
-      var fileName = file.getName();
-      var fileType = file.getMimeType();
-      
-      if(fileType != mimeTypes.folder){
-        allFiles[fileId] = [folderName + sep + fileName, fileType]; 
-      } else {
-        allFolders[folder.getId()] = folderName;
-        walk(file, sep);
-      }
-    }
-  }
-  walk(drive_root, ".");
-  return [allFiles, allFolders];
 }
 
 function testGetAllDriveData(){
