@@ -2,60 +2,7 @@
  *  @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
-/**
- * Adds a custom menu with items to show the sidebar and dialog.
- *
- * @param {Object} e The event parameter for a simple onOpen trigger.
- */
-function onOpen() {
-  var ui = SpreadsheetApp.getUi();
 
-  ui
-  .createAddonMenu()
-  .addItem('GetDriveData', 'showUpLoadBar')
-  .addToUi();
-
-  showUploadBar();
-}
-
-/**
- * Opens a sidebar. The sidebar structure is described in the Sidebar.html
- * project file.
- 
- * For example,
- 
- function doGet(request) {
-  return HtmlService.createTemplateFromFile('Page')
-      .evaluate();
-}
-
-function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename)
-      .getContent();
-}
-
- */
-function showUpLoadBar() {
-  var ui = HtmlService.createTemplateFromFile('uploadBar')
-  .evaluate()
-  .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-  SpreadsheetApp.getUi().showSidebar(ui);
-}
-
-function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename)
-      .getContent();
-}
-
-// Prevent forms from submitting.
-function preventFormSubmit() {
-  var forms = document.querySelectorAll('form');
-  for (var i = 0; i < forms.length; i++) {
-    forms[i].addEventListener('submit', function(event) {
-      event.preventDefault();
-    });
-  }
-}
 /** 
  * Global Variables
  *
@@ -188,7 +135,12 @@ var gVol = {
   }
 };
 
-/* Google mimeTypes */
+/** 
+* Google mimeTypes 
+*
+*
+* [TODO] Find the reference for this
+*/
 var mimeTypes = {
   'audio': 'application/vnd.google-apps.audio',
   'document': 'application/vnd.google-apps.document',
@@ -210,6 +162,9 @@ var mimeTypes = {
 
 var mimeTypes_keys = Object.keys(mimeTypes);
 
+/*************************************************************
+*                     * Utility Functions *                  *
+**************************************************************/
 
 /**
  * Creates a column object whose keys are the column header names and corresponding
@@ -245,20 +200,67 @@ function Columns(obj, sep, idx){
   return list;
 }
 
+/*************************************************************
+*                   * UI Display Functions *                 *
+**************************************************************/
 /**
- * This tests the function, @makeCoumn by providing an object representing a database document model.   
+ * Adds a custom menu with items to show the sidebar and dialog.
  *
- * @test
+ * @param {Object} e The event parameter for a simple onOpen trigger.
  */
-function testColumns(){
-  var columns = Columns(gVol, "_", 0);
-  Object.keys(columns).forEach(function(col){
-    Logger.log([col, columns[col]]);
-  });
+function onOpen() {
+  var ui = SpreadsheetApp.getUi();
+  
+  ui.createAddonMenu()
+  .addItem('GetDriveData', 'showUpLoadBar')
+  .addToUi();
 }
 
 /**
- * Creates the header
+* Opens a sidebar. The sidebar structure is described in the Sidebar.html
+* project file.
+*
+*/
+function showUpLoadBar() {
+  var ui = HtmlService.createTemplateFromFile('uploadBar')
+  .evaluate()
+  .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+  SpreadsheetApp.getUi().showSidebar(ui);
+}
+
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename)
+      .getContent();
+}
+
+// Prevent forms from submitting.
+function preventFormSubmit() {
+  var forms = document.querySelectorAll('form');
+  for (var i = 0; i < forms.length; i++) {
+    forms[i].addEventListener('submit', function(event) {
+      event.preventDefault();
+    });
+  }
+}
+
+/**
+ * Displays an HTML-service dialog in Google Sheets that contains client-side
+ * JavaScript code for the Google Picker API.
+ */
+function showPicker() {
+  var html = HtmlService.createHtmlOutputFromFile('filePickerExample.html')
+      .setWidth(600)
+      .setHeight(425)
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+  SpreadsheetApp.getUi().showModalDialog(html, 'Select Folder');
+}
+
+/*************************************************************
+*                       * Main Functions *                   *
+**************************************************************/
+
+/**
+ * Initialize the header object
  */
 function Header(columns, opts){
   this.columns = columns;
@@ -272,6 +274,7 @@ function Header(columns, opts){
   this.update = { by: "", data: null, num: 0};
 }
 
+// Compare two header objects
 Header.prototype.isEqualTo = function(obj){
   var self = this;
   var isSameHeader = true;
@@ -283,8 +286,8 @@ Header.prototype.isEqualTo = function(obj){
   return isSameHeader;
 };
 
-/* Render new header on current active sheet */
-Header.prototype.render = function(opts){
+/* Render a header object on current active sheet */ 
+Header.prototype.render = function(opts){ 
   var self = this;
   self.ss =  opts && opts.ss ? opts.ss : SpreadsheetApp.getActiveSpreadsheet();
   self.sheet = opts && opts.sheet ? opts.sheet : self.ss.getActiveSheet();
@@ -390,19 +393,74 @@ Header.prototype.hide = function(){
 Header.prototype.update = function(){};
 
 
-/**
- * Test for 'makeHeader'
- */
-function testHeader(){
+function getAllDriveData(){
 
-  var tests = {};
+  // Log the name of every file in the user's Drive.
+  var drive_root = DriveApp.getRootFolder();
+  var allFiles = {};
+  var allFolders = {};
+  
+  function walk(folder, sep){
+     // Get folder data
+    var folderName = folder.getName();
+    var files = folder.getFiles();
+
+    while(files.hasNext()){
+      var file = files.next();
+      var fileId = file.getId();
+      var fileName = file.getName();
+      var fileType = file.getMimeType();
+      
+      if(fileType != mimeTypes.folder){
+        allFiles[fileId] = [folderName + sep + fileName, fileType]; 
+      } else {
+        allFolders[folder.getId()] = folderName;
+        walk(file, sep);
+      }
+    }
+  }
+  walk(drive_root, ".");
+  return [allFiles, allFolders];
+}
+
+/**
+* returns an authentication token needed in order to use the file picker
+*
+*/
+function getOAuthToken() {
+  DriveApp.getRootFolder();
+  return DriveApp.getOAuthToken();;
+}
+/*************************************************************
+*                  * Testing Suite Functions *               *
+**************************************************************/
+
+/**
+* This tests the function, @makeCoumn by providing an object 
+* representing a database document model.   
+*    
+* @test
+*/
+function testColumns(){
+  var columns = Columns(gVol, "_", 0);
+  Object.keys(columns).forEach(function(col){
+    Logger.log([col, columns[col]]);
+  });
+}
+
+/**
+* Test for 'makeHeader'
+*/
+function testHeader(){
+  var dice = {};
+  var tests = {}; 
   var candidates = [];
-  var fails = [];
+  var fails = []; 
 
   function getFuncName() {
     return getFuncName.caller.name;
   }
-
+  
   function getTest(testId){
     var defaultTestIds = [4, 4, 5, 5, 5];
 
@@ -481,6 +539,49 @@ function testHeader(){
       Logger.log(idx[VAL]);
     });
 
+    var idx = {};
+    idx.vol = 0;
+    idx.ss = 1;
+    idx.sheet = 2;
+    idx.row = 3;
+    idx.col = 4;
+    idx.width = 5;
+
+    // Given an arbitrary natuaral number, N, this function will return a 'random' second natuaral number in the interval [0,N) 
+    var randNat = function(maxSize) { return Math.floor(maxSize*Math.random()); };
+    
+    // Common initialization values
+    var Opts = [null, "", [], {} ];
+
+    // Create a die
+    dice.vol = Opts.concat([gVol]);
+    try{
+      dice.ss = Opts.concat([SpreadsheetApp.getActiveSpreadsheet()]);
+    }catch(e){
+      fails.push(e);
+      // Logger.log(e);
+    }
+
+    try{
+      dice.sheet = Opts.concat([dice.ss[4].getActiveSheet(), SpreadsheetApp.getActiveSheet()]);
+    }catch(e){
+      fails.push(e);
+      // Logger.log(e);
+    }
+    dice.row = Opts.concat([NaN, 0, randNat(10), -1*randNat(8)]);
+    dice.col = Opts.concat([NaN, 0, randNat(9), -1*randNat(11)]);
+    dice.width = Opts.concat([NaN, 0, randNat(3), -1*randNat(5)]);
+
+    // Set the index based on 'testId' parameters
+    var isValidTestId = testId.constructor.name != "Array" || testId === null;
+    var Idx = Object.keys(idx);
+    Idx.forEach(function(VAL){
+      Logger.log(VAL);
+      var testIdx = Idx.indexOf(VAL, 0)
+      idx[VAL] = !isValidTestId ? randNat( dice[VAL].length ) : !!tesId[testIdx] && typeof testId[testIdx] == "number" ? testId[testIdx] : defaultTestIds[testIdx];
+      Logger.log(idx[VAL]);
+    });
+
     /** [DEP] Keep until we confirm the corresponding section is confirmed to have worked as intended*/ 
 
     // // Set the index based on 'testId' parameters
@@ -499,10 +600,15 @@ function testHeader(){
     testModel.opts.start.row = dice.row[ idx.row ];
     testModel.opts.start.col = dice.col[ idx.col ];
     testModel.opts.width = dice.width[ idx.width ];
-
+    
     return testModel;
   }
-
+  
+  /** 
+  * [TODO] Create a sheet in which to run the tests 
+  * 
+  * "Before I begin runnning the tests, I will create "
+  * */ 
   function before(){
 
       /**
@@ -513,17 +619,12 @@ function testHeader(){
 
     try{
       // Getting the Active SpreadSheet
-      Logger.log("In 'before' but it doesn't do anything just yet")
       SpreadsheetApp.getActiveSpreadsheet();
 
       // Create a new sheet
 
-      // Create 
-    tests[current_idx] = getTest([null, null, null, ]);
-
     }catch(e){
-       Logger.log("There was an error in the before function. The following error was thrown: "+e);
-
+      // Logger.log(e);
     }
   }
 

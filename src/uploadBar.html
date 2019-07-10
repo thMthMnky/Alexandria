@@ -2,6 +2,7 @@
 <html>
   <head>
     <base target="_top">
+//  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
     <?!= HtmlService.createHtmlOutputFromFile('Stylesheet').getContent(); ?>
     <script>
       /** [DEP] Keep until the button populates the Active Spreadsheet */
@@ -55,7 +56,12 @@
       </form>
       <div id="output"></div> -->
     </div>
+    <div>
+        <p id='result'></p>
+    </div>
 
     <!-- Use a templated HTML printing scriptlet to import JavaScript. -->
-    <?!= HtmlService.createHtmlOutputFromFile('uploadBarJS').getContent(); ?>  </body>
+    <?!= HtmlService.createHtmlOutputFromFile('uploadBarJS').getContent(); ?>
+    <!-- <script type="text/javascript" src="https://apis.google.com/js/api.js?onload=onApiLoad"></script> -->
+  </body>
 </html>
