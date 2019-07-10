@@ -2,57 +2,7 @@
  *  @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
-/**
- * Adds a custom menu with items to show the sidebar and dialog.
- *
- * @param {Object} e The event parameter for a simple onOpen trigger.
- */
-function onOpen() {
-  var ui = SpreadsheetApp.getUi();
-  ui 
-  .createAddonMenu()
-  .addItem('GetDriveData', 'showUpLoadBar')
-  .addToUi();
-}
 
-/**
- * Opens a sidebar. The sidebar structure is described in the Sidebar.html
- * project file.
- 
- * For example,
- 
- function doGet(request) {
-  return HtmlService.createTemplateFromFile('Page')
-      .evaluate();
-}
-
-function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename)
-      .getContent();
-}
-
- */
-function showUpLoadBar() {
-  var ui = HtmlService.createTemplateFromFile('uploadBar')
-  .evaluate()
-  .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-  SpreadsheetApp.getUi().showSidebar(ui);
-}
-
-function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename)
-      .getContent();
-}
-
-// Prevent forms from submitting.
-function preventFormSubmit() {
-  var forms = document.querySelectorAll('form');
-  for (var i = 0; i < forms.length; i++) {
-    forms[i].addEventListener('submit', function(event) {
-      event.preventDefault();
-    });
-  }
-}
 /** 
  * Global Variables
  *
@@ -185,7 +135,12 @@ var gVol = {
   }
 };
 
-/* Google mimeTypes */
+/** 
+* Google mimeTypes 
+*
+*
+* [TODO] Find the reference for this
+*/
 var mimeTypes = {
   'audio': 'application/vnd.google-apps.audio',
   'document': 'application/vnd.google-apps.document',
@@ -207,6 +162,9 @@ var mimeTypes = {
 
 var mimeTypes_keys = Object.keys(mimeTypes);
 
+/*************************************************************
+*                     * Utility Functions *                  *
+**************************************************************/
 
 /**
  * Creates a column object whose keys are the column header names and corresponding 
@@ -242,20 +200,67 @@ function Columns(obj, sep, idx){
   return list;
 }
 
+/*************************************************************
+*                   * UI Display Functions *                 *
+**************************************************************/
 /**
- * This tests the function, @makeCoumn by providing an object representing a database document model.   
- *    
- * @test
+ * Adds a custom menu with items to show the sidebar and dialog.
+ *
+ * @param {Object} e The event parameter for a simple onOpen trigger.
  */
-function test_Columns(){
-  var columns = Columns(gVol, "_", 0);
-  Object.keys(columns).forEach(function(col){
-    Logger.log([col, columns[col]]);
-  });
+function onOpen() {
+  var ui = SpreadsheetApp.getUi();
+  
+  ui.createAddonMenu()
+  .addItem('GetDriveData', 'showUpLoadBar')
+  .addToUi();
 }
 
 /**
- * Creates the header
+* Opens a sidebar. The sidebar structure is described in the Sidebar.html
+* project file.
+*
+*/
+function showUpLoadBar() {
+  var ui = HtmlService.createTemplateFromFile('uploadBar')
+  .evaluate()
+  .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+  SpreadsheetApp.getUi().showSidebar(ui);
+}
+
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename)
+      .getContent();
+}
+
+// Prevent forms from submitting.
+function preventFormSubmit() {
+  var forms = document.querySelectorAll('form');
+  for (var i = 0; i < forms.length; i++) {
+    forms[i].addEventListener('submit', function(event) {
+      event.preventDefault();
+    });
+  }
+}
+
+/**
+ * Displays an HTML-service dialog in Google Sheets that contains client-side
+ * JavaScript code for the Google Picker API.
+ */
+function showPicker() {
+  var html = HtmlService.createHtmlOutputFromFile('filePickerExample.html')
+      .setWidth(600)
+      .setHeight(425)
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+  SpreadsheetApp.getUi().showModalDialog(html, 'Select Folder');
+}
+
+/*************************************************************
+*                       * Main Functions *                   *
+**************************************************************/
+
+/**
+ * Initialize the header object
  */
 function Header(columns, opts){
   this.columns = columns;
@@ -273,6 +278,7 @@ function Header(columns, opts){
   this.updatedNum = "";
 } 
 
+// Compare two header objects
 Header.prototype.isEqualTo = function(obj){
   var self = this;
   var isSameHeader = true;
@@ -284,7 +290,7 @@ Header.prototype.isEqualTo = function(obj){
   return isSameHeader;
 };
 
-/* Render new header on current active sheet */ 
+/* Render a header object on current active sheet */ 
 Header.prototype.render = function(opts){ 
   var self = this;
   self.ss =  opts && opts.ss ? opts.ss : SpreadsheetApp.getActiveSpreadsheet();
@@ -373,20 +379,77 @@ Header.prototype.hide = function(){
 Header.prototype.update = function(){};
 
 
+function getAllDriveData(){
+
+  // Log the name of every file in the user's Drive.
+  var drive_root = DriveApp.getRootFolder();
+  var allFiles = {};
+  var allFolders = {};
+  
+  function walk(folder, sep){
+     // Get folder data
+    var folderName = folder.getName();
+    var files = folder.getFiles();
+
+    while(files.hasNext()){
+      var file = files.next();
+      var fileId = file.getId();
+      var fileName = file.getName();
+      var fileType = file.getMimeType();
+      
+      if(fileType != mimeTypes.folder){
+        allFiles[fileId] = [folderName + sep + fileName, fileType]; 
+      } else {
+        allFolders[folder.getId()] = folderName;
+        walk(file, sep);
+      }
+    }
+  }
+  walk(drive_root, ".");
+  return [allFiles, allFolders];
+}
+
 /**
- * Test for 'makeHeader'
- */
+* returns an authentication token needed in order to use the file picker
+*
+*/
+function getOAuthToken() {
+  DriveApp.getRootFolder();
+  return DriveApp.getOAuthToken();;
+}
+/*************************************************************
+*                  * Testing Suite Functions *               *
+**************************************************************/
+
+/**
+* This tests the function, @makeCoumn by providing an object 
+* representing a database document model.   
+*    
+* @test
+*/
+function testColumns(){
+  var columns = Columns(gVol, "_", 0);
+  Object.keys(columns).forEach(function(col){
+    Logger.log([col, columns[col]]);
+  });
+}
+
+/**
+* Test for 'makeHeader'
+*/
 function testHeader(){
+  var dice = {};
+  var tests = {}; 
   var candidates = [];
-  var tests = []; 
   var fails = []; 
 
   function getFuncName() {
     return getFuncName.caller.name;
   }
   
-  function getRandomTest(){
-    
+  function getTest(testId){
+    var defaultTestIds = [4, 4, 5, 0, 0];
+
     // Test-object model
     var testModel = {
       vols: null,
@@ -425,9 +488,75 @@ function testHeader(){
     testModel.opts.start.col = dice[4][randInt(dice[4].length)];
     testModel.opts.width = dice[5][randInt(dice[5].length)];
 
+    var idx = {};
+    idx.vol = 0;
+    idx.ss = 1;
+    idx.sheet = 2;
+    idx.row = 3;
+    idx.col = 4;
+    idx.width = 5;
+
+    // Given an arbitrary natuaral number, N, this function will return a 'random' second natuaral number in the interval [0,N) 
+    var randNat = function(maxSize) { return Math.floor(maxSize*Math.random()); };
+    
+    // Common initialization values
+    var Opts = [null, "", [], {} ];
+
+    // Create a die
+    dice.vol = Opts.concat([gVol]);
+    try{
+      dice.ss = Opts.concat([SpreadsheetApp.getActiveSpreadsheet()]);
+    }catch(e){
+      fails.push(e);
+      // Logger.log(e);
+    }
+
+    try{
+      dice.sheet = Opts.concat([dice.ss[4].getActiveSheet(), SpreadsheetApp.getActiveSheet()]);
+    }catch(e){
+      fails.push(e);
+      // Logger.log(e);
+    }
+    dice.row = Opts.concat([NaN, 0, randNat(10), -1*randNat(8)]);
+    dice.col = Opts.concat([NaN, 0, randNat(9), -1*randNat(11)]);
+    dice.width = Opts.concat([NaN, 0, randNat(3), -1*randNat(5)]);
+
+    // Set the index based on 'testId' parameters
+    var isValidTestId = testId.constructor.name != "Array" || testId === null;
+    var Idx = Object.keys(idx);
+    Idx.forEach(function(VAL){
+      Logger.log(VAL);
+      var testIdx = Idx.indexOf(VAL, 0)
+      idx[VAL] = !isValidTestId ? randNat( dice[VAL].length ) : !!tesId[testIdx] && typeof testId[testIdx] == "number" ? testId[testIdx] : defaultTestIds[testIdx];
+      Logger.log(idx[VAL]);
+    });
+
+    /** [DEP] Keep until we confirm the corresponding section is confirmed to have worked as intended*/ 
+
+    // // Set the index based on 'testId' parameters
+    // vols_Idx = !isValidTestId ? randNat( dice.vol.length ) : !!tesId[0] && typeof testId[0] == "number" ? testId[0] : 4;
+    // ss_Idx = !isValidTestId ? randNat( dice.ss.length ) : !!tesId[1]  && typeof testId[1] == "number" ? testId[1] : 4 ;
+    // sheet_Idx = !isValidTestId ? randNat( dice.sheet.length ) : !!tesId[2]  && typeof testId[2] == "number" ? testId[2] : 5;
+    // row_Idx = !isValidTestId ? randNat( dice.row.length ) : !!tesId[3]  && typeof testId[3] == "number" ? testId[3] : 0;
+    // col_Idx = !isValidTestId ? randNat( dice.col.length ) : !!tesId[4]  && typeof testId[4] == "number" ? testId[4] : 0;
+    // width_Idx = !isValidTestId ? randNat( dice.width.length ) : !!tesId[5]  && typeof testId[5] == "number" ? testId[5] : 0;
+
+    // Accept correct params or Set 'safe' defaults
+    testModel.vols = dice.vol[ idx.vol ];
+    testModel.opts.ss = dice.ss[ idx.ss ];
+    testModel.opts.sheet = dice.sheet[ idx.sheet ];
+    testModel.opts.start.row = dice.row[ idx.row ];
+    testModel.opts.start.col = dice.col[ idx.col ];
+    testModel.opts.width = dice.width[ idx.width ];
+    
     return testModel;
   }
   
+  /** 
+  * [TODO] Create a sheet in which to run the tests 
+  * 
+  * "Before I begin runnning the tests, I will create "
+  * */ 
   function before(){
       /** 
        * [TODO] Create a sheet in which to run the tests 
@@ -435,52 +564,61 @@ function testHeader(){
        * "Before I begin runnning the tests, I will create "
        * */ 
     try{
-      SpreadsheetApp.getActiveSheet().clear();
+      // Getting the Active SpreadSheet
+      SpreadsheetApp.getActiveSpreadsheet();
+
+      // Create a new sheet
+
     }catch(e){
-      Logger.log(e);
+      // Logger.log(e);
     }
   }
-  /** 
-   * [TODO] 
-   * 
-   * 
-   * */
-  function beforeEach(current_idx){
-    tests[current_idx] = getRandomTest();
 
+  /** 
+  * [TODO] 
+  * 
+  * 
+  * */
+  function beforeEach(current_idx){
+    tests[current_idx] = getTest([null, null, null, ]);
     try{
       headings = Columns(tests[current_idx].vols, " ", 0);
       options = tests[current_idx].opts;
       candidates.push(new Header(headings, options));
     }catch(e){
-      fails.push("Failed " + beforeEach + " @ index " + current_idx  + " with error: " + e);
-      Logger.log(e);
+      fails.push("Failed " + beforeEach.name + " @ index " + current_idx  + " with error: " + e);
+      // Logger.log(e)
     }
   }
 
   /**
-   * [TODO] Run the test 
-   * 
-   * "For the candidate at position @current_idx , "
-   * */
-  function testing(current_idx){
+  * [TODO] Run the test 
+  * 
+  * "For the candidate at position @current_idx , "
+  */
+  function testingRender(current_idx){
     var testResults = true;
     try{
      testResults = candidates[current_idx].isEqualTo(candidates[current_idx -1]);
     }catch(e){
-      fails.push("Failed " + testing + " @ index " + current_idx  + " with error: " + e);
-      Logger.log(e);
+      fails.push("Failed " + testingRender.name + " @ index " + current_idx  + " with error: " + e);
+      // Logger.log(e);
     }
     Logger.log(testResults);
     return testResults;
   }
-  
+
+  /**
+  * [TODO] Run the test 
+  * 
+  * "For the candidate at position @current_idx , "
+  */
   function afterEach(current_idx){
     try{
       candidates[current_idx].render();
     }catch(e){
       fails.push("Failed " + afterEach.name + " @ index " + current_idx  + " with error: " + e);
-      Logger.log(e);
+      // Logger.log(e);
     }
   }
   
@@ -491,7 +629,7 @@ function testHeader(){
     before();
     for(var i = 0; i < 7; i++){
       beforeEach(i);
-      passedAll = passedAll && testing(i);
+      passedAll = passedAll && testingRender(i);
       afterEach(i);
     }
     after();
