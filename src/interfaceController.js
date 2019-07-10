@@ -26,11 +26,11 @@ var HEADER_FONT_SIZE = 14;
  */
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
-  ui
+  ui 
   .createMenu()
   .addItem('GetDriveData', 'showUpLoadBar')
   .addToUi();
-
+  
   showUploadBar();
 }
 
@@ -272,7 +272,7 @@ Header.prototype.render = function(opts){
   var self = this;
   self.ss =  opts && opts.ss ? opts.ss : SpreadsheetApp.getActiveSpreadsheet();
   self.sheet = opts && opts.sheet ? opts.sheet: self.ss.getActiveSheet();
-
+    
   function emptyStringArrayOfLength(num){
     var arr = [];
     while(arr.length < num) arr.push("");
@@ -284,12 +284,12 @@ Header.prototype.render = function(opts){
   while(_header_rows.length < self.width){
     _header_rows.push(emptyStringArrayOfLength(self.index.length));
   }
-
   _header_rows.reverse();
-
+  
+  var _header_metadata = {};
   var components = [{
     name: "main",
-    range: (function (){ return self.sheet.getRange(self.row, self.column, self.width, self.index.length); })(),
+    range: function (){ return self.sheet.getRange(self.row, self.column, self.width, self.index.length); },
     values: _header_rows,
     background: PRIMARY_COLOR,
     fColor: PRIMARY_FONT_COLOR,
@@ -317,10 +317,10 @@ Header.prototype.render = function(opts){
     fVert: HEADER_TEXT_VERT_ALIGNMENT,
     fSize: HEADER_FONT_SIZE
   }];
-
+  
   function _render(type, range, values, background, fColor, fHorz, fVert, fSize){
-    range()
-    .setBackground(background)
+    range
+    .setBackground(background) 
     .setFontColor(fColor)
     .setHorizontalAlignment(fHorz)// 'center'
     .setVerticalAlignment(fVert)// 'middle'
@@ -328,16 +328,14 @@ Header.prototype.render = function(opts){
     .setValues(values);
   }
 
-  for( var i = 0; i < components.length ){
-   _render(components[i].name,
-	  components[i].range(),
-	  components[i].values,
-	  components[i].background,
-	  components[i].fColor,
-	  components[i].fHorz,
-	  components[i].fVert,
-	  components[i].fSize );
-  }
+  _render(components[0].name, 
+    components[0].range(), 
+    components[0].values, 
+    components[0].background, 
+    components[0].fColor, 
+    components[0].fHorz, 
+    components[0].fVert, 
+    components[0].fSize );
 };
 
 /* Shift the header X units to the right */
