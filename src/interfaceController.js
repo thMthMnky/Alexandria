@@ -4,7 +4,7 @@
 
 
 /** 
- * Global Variables
+ * Global UI Variables
  *
  */
 var COLUMN_WIDTH = '16px';
@@ -198,7 +198,7 @@ function Columns(obj, sep, idx){
     }
   }, obj);
   return list;
-}
+};
 
 /*************************************************************
 *                   * UI Display Functions *                 *
@@ -210,7 +210,7 @@ function Columns(obj, sep, idx){
  */
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
-  
+
   ui.createAddonMenu()
   .addItem('GetDriveData', 'showUpLoadBar')
   .addToUi();
