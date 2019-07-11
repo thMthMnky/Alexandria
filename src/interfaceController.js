@@ -150,13 +150,13 @@ var mimeTypes = {
   'form': 'application/vnd.google-apps.form',
   'fusiontable': 'application/vnd.google-apps.fusiontable',
   'map': 'application/vnd.google-apps.map',
-  'photo': 'application/vnd.google-apps.photo',	
+  'photo': 'application/vnd.google-apps.photo',
   'presentation': 'application/vnd.google-apps.presentation',
   'script': 'application/vnd.google-apps.script',
   'site': 'application/vnd.google-apps.site',
   'spreadsheet': 'application/vnd.google-apps.spreadsheet',
-  'unknown': 'application/vnd.google-apps.unknown',	
-  'video': 'application/vnd.google-apps.video',	
+  'unknown': 'application/vnd.google-apps.unknown',
+  'video': 'application/vnd.google-apps.video',
   'drive-sdk': 'application/vnd.google-apps.drive-sdk'
 };
 
@@ -173,7 +173,7 @@ var mimeTypes_keys = Object.keys(mimeTypes);
  *
  * @param {Object} obj The object from which we derive the column names
  * @param {String} sep The type of separator to be used in setting heading titles. By default, sep="."
- * 
+ *
  */
 function Columns(obj, sep, idx){
   sep = sep ? sep : " ";
@@ -193,7 +193,7 @@ function Columns(obj, sep, idx){
           Object.keys(Columns(el, sep, idx)).forEach(function(sK){
             list[key+sep+sK] = idx++;
           });
-        } 
+        }
       });
     }
   }, obj);
@@ -281,17 +281,13 @@ function Header(columns, opts){
   this.columns = columns;
   this.index =  Object.keys(this.columns);
   this.visible = true;
-  
   this.ss = null;
-  this.sheet =null;  
+  this.sheet =null;
   this.row = opts && opts.start.row ? opts.start.row : 1;
   this.column = opts && opts.start.column ? opts.start.column : 1;
-  this.width = opts && opts.width ? opts.width : 1; 
-  
-  this.updatedBy = "";
-  this.updatedDate = Date.now();
-  this.updatedNum = "";
-} 
+  this.width = opts && opts.width ? opts.width : 1;
+  this.update = { by: "", data: null, num: 0};
+}
 
 // Compare two header objects
 Header.prototype.isEqualTo = function(obj){
@@ -360,10 +356,10 @@ Header.prototype.render = function(opts){
   .setValues(_header_metadata.values[1]);
 };
 
-/* Shift the header X units to the right */ 
+/* Shift the header X units to the right */
 Header.prototype.shift = function(amount, direction){
   var self = this;
-
+ var amount = amount ? amount : 0;
   self.sheet.deleteRows(self.row, self.width);
   while(amount > 0){
     switch(direction){
@@ -388,7 +384,7 @@ Header.prototype.shift = function(amount, direction){
 
 Header.prototype.hide = function(){
   var self = this;
-  self.sheet.getRange();
+  self.sheet.getRange(self.row, self.column, self.width, self.index.length).hideRange();
 };
 
 Header.prototype.update = function(){};
@@ -453,17 +449,16 @@ function testColumns(){
 * Test for 'makeHeader'
 */
 function testHeader(){
-  var dice = {};
-  var tests = {}; 
+  var tests = {};
   var candidates = [];
-  var fails = []; 
+  var fails = [];
 
   function getFuncName() {
     return getFuncName.caller.name;
   }
-  
+
   function getTest(testId){
-    var defaultTestIds = [4, 4, 5, 0, 0];
+    var defaultTestIds = [4, 4, 5, 5, 5];
 
     // Test-object model
     var testModel = {
@@ -487,74 +482,34 @@ function testHeader(){
     idx.col = 4;
     idx.width = 5;
 
-    // Given an arbitrary natuaral number, N, this function will return a 'random' second natuaral number in the interval [0,N) 
-    var randNat = function(maxSize) { return Math.floor(maxSize*Math.random()); };
-    
-    // Common initialization values
-    var Opts = [null, "", [], {} ];
+    function getDice(opts){
+      var dice = {};
 
-    // Create a die
-    dice.vol = Opts.concat([gVol]);
-    try{
-      dice.ss = Opts.concat([SpreadsheetApp.getActiveSpreadsheet()]);
-    }catch(e){
-      fails.push(e);
-      // Logger.log(e);
+      // Given an arbitrary natuaral number, N, this function will return a 'random' second natuaral number in the interval [0,N) 
+      var randNat = function(maxSize) { return Math.floor(maxSize*Math.random()); };
+
+      // Common initialization values
+      var Opts = [null, "", [], {} ];
+
+      // Create a die
+      dice.vol = Opts.concat([gVol]);
+      try{
+        dice.ss = Opts.concat([SpreadsheetApp.getActiveSpreadsheet()]);
+      }catch(e){
+        fails.push(e);
+        // Logger.log(e);
+      }
+
+      try{
+        dice.sheet = Opts.concat([dice.ss[4].getActiveSheet(), SpreadsheetApp.getActiveSheet()]);
+      }catch(e){
+        fails.push(e);
+        // Logger.log(e);
+      }
+      dice.row = Opts.concat([NaN, 0, randNat(10), -1*randNat(8)]);
+      dice.col = Opts.concat([NaN, 0, randNat(9), -1*randNat(11)]);
+      dice.width = Opts.concat([NaN, 0, randNat(3), -1*randNat(5)]);
     }
-
-    try{
-      dice.sheet = Opts.concat([dice.ss[4].getActiveSheet(), SpreadsheetApp.getActiveSheet()]);
-    }catch(e){
-      fails.push(e);
-      // Logger.log(e);
-    }
-    dice.row = Opts.concat([NaN, 0, randNat(10), -1*randNat(8)]);
-    dice.col = Opts.concat([NaN, 0, randNat(9), -1*randNat(11)]);
-    dice.width = Opts.concat([NaN, 0, randNat(3), -1*randNat(5)]);
-
-    // Set the index based on 'testId' parameters
-    var isValidTestId = testId.constructor.name != "Array" || testId === null;
-    var Idx = Object.keys(idx);
-    Idx.forEach(function(VAL){
-      Logger.log(VAL);
-      var testIdx = Idx.indexOf(VAL, 0)
-      idx[VAL] = !isValidTestId ? randNat( dice[VAL].length ) : !!tesId[testIdx] && typeof testId[testIdx] == "number" ? testId[testIdx] : defaultTestIds[testIdx];
-      Logger.log(idx[VAL]);
-    });
-
-    var idx = {};
-    idx.vol = 0;
-    idx.ss = 1;
-    idx.sheet = 2;
-    idx.row = 3;
-    idx.col = 4;
-    idx.width = 5;
-
-    // Given an arbitrary natuaral number, N, this function will return a 'random' second natuaral number in the interval [0,N) 
-    var randNat = function(maxSize) { return Math.floor(maxSize*Math.random()); };
-    
-    // Common initialization values
-    var Opts = [null, "", [], {} ];
-
-    // Create a die
-    dice.vol = Opts.concat([gVol]);
-    try{
-      dice.ss = Opts.concat([SpreadsheetApp.getActiveSpreadsheet()]);
-    }catch(e){
-      fails.push(e);
-      // Logger.log(e);
-    }
-
-    try{
-      dice.sheet = Opts.concat([dice.ss[4].getActiveSheet(), SpreadsheetApp.getActiveSheet()]);
-    }catch(e){
-      fails.push(e);
-      // Logger.log(e);
-    }
-    dice.row = Opts.concat([NaN, 0, randNat(10), -1*randNat(8)]);
-    dice.col = Opts.concat([NaN, 0, randNat(9), -1*randNat(11)]);
-    dice.width = Opts.concat([NaN, 0, randNat(3), -1*randNat(5)]);
-
     // Set the index based on 'testId' parameters
     var isValidTestId = testId.constructor.name != "Array" || testId === null;
     var Idx = Object.keys(idx);
@@ -575,8 +530,9 @@ function testHeader(){
     // col_Idx = !isValidTestId ? randNat( dice.col.length ) : !!tesId[4]  && typeof testId[4] == "number" ? testId[4] : 0;
     // width_Idx = !isValidTestId ? randNat( dice.width.length ) : !!tesId[5]  && typeof testId[5] == "number" ? testId[5] : 0;
 
+
     // Accept correct params or Set 'safe' defaults
-    testModel.vols = dice.vol[ idx.vol ];
+    testModel.vol = dice.vol[ idx.vol ];
     testModel.opts.ss = dice.ss[ idx.ss ];
     testModel.opts.sheet = dice.sheet[ idx.sheet ];
     testModel.opts.start.row = dice.row[ idx.row ];
@@ -592,11 +548,6 @@ function testHeader(){
   * "Before I begin runnning the tests, I will create "
   * */ 
   function before(){
-      /** 
-       * [TODO] Create a sheet in which to run the tests 
-       * 
-       * "Before I begin runnning the tests, I will create "
-       * */ 
     try{
       // Getting the Active SpreadSheet
       SpreadsheetApp.getActiveSpreadsheet();
@@ -616,11 +567,11 @@ function testHeader(){
   function beforeEach(current_idx){
     tests[current_idx] = getTest([null, null, null, ]);
     try{
-      headings = Columns(tests[current_idx].vols, " ", 0);
+      headings = Columns(tests[current_idx].vols, "__t ${ current_idx } t__", 0);
       options = tests[current_idx].opts;
       candidates.push(new Header(headings, options));
     }catch(e){
-      fails.push("Failed " + beforeEach.name + " @ index " + current_idx  + " with error: " + e);
+      fails.push("Failed " + getFuncName() + " @ index " + current_idx  + " with error: " + e);
       // Logger.log(e)
     }
   }
@@ -633,9 +584,11 @@ function testHeader(){
   function testingRender(current_idx){
     var testResults = true;
     try{
-     testResults = candidates[current_idx].isEqualTo(candidates[current_idx -1]);
+     testResults = candidates[current_idx].render();
+	// this shoud simply test if the test was rendered
     }catch(e){
-      fails.push("Failed " + testingRender.name + " @ index " + current_idx  + " with error: " + e);
+      fails.push("Failed " + getFuncName() + " @ index " + current_idx  + " with error: " + e);
+
       // Logger.log(e);
     }
     Logger.log(testResults);
@@ -651,26 +604,72 @@ function testHeader(){
     try{
       candidates[current_idx].render();
     }catch(e){
-      fails.push("Failed " + afterEach.name + " @ index " + current_idx  + " with error: " + e);
+      fails.push("Failed " + getFuncName() + " @ index " + current_idx  + " with error: " + e);
       // Logger.log(e);
     }
   }
-  
+
   function after(){}
-  
+
   function RunTheTests(){
     var passedAll = true;
     before();
-    for(var i = 0; i < 7; i++){
+    for(var i = 0; i < Object.keys(tests).length; i++){
       beforeEach(i);
       passedAll = passedAll && testingRender(i);
+      // passedAll = passedAll && testingShift(i);
+      // passedAll = passedAll && testingHide(i);
+      // passedAll = passedAll && testingDestroy(i);
       afterEach(i);
     }
     after();
     return passedAll;
   }
-  
   return RunTheTests();
+}
+
+function TestingSuite(opts){
+  this.opts = !!opts ? opts : {};
+  this.ss = null;
+  this.sheet = null;
+  this.lastRun = !!opts.lastRun ? opts.lastRun : {};
+  this.lastRun.date = !!opts.lastRun.date ? opts.lastRun.data : new Date();
+  this.lastRun.results = !!opts.lastRun.results ? opts.lastRun.results : true;
+}
+
+function getAllDriveData(){
+
+  // Log the name of every file in the user's Drive.
+  var allFiles = {};
+  var allFolders = {};
+  var drive_root;
+  try{
+    drive_root = DriveApp.getRootFolder();
+  }catch(e){
+    Logger.log(e);
+  }
+
+  function walk(folder, sep){
+     // Get folder data
+    var folderName = folder.getName();
+    var files = folder.getFiles();
+
+    while(files.hasNext()){
+      var file = files.next();
+      var fileId = file.getId();
+      var fileName = file.getName();
+      var fileType = file.getMimeType();
+
+      if(fileType != mimeTypes.folder){
+        allFiles[fileId] = [folderName + sep + fileName, fileType];
+      } else {
+        allFolders[folder.getId()] = folderName;
+        walk(file, sep);
+      }
+    }
+  }
+  walk(drive_root, ".");
+  return [allFiles, allFolders];
 }
 
 function testGetAllDriveData(){
