@@ -199,7 +199,7 @@ function Columns(obj, sep, idx){
     }
   }, obj);
   return list;
-};
+}
 
 /*************************************************************
 *                   * UI Display Functions *                 *
@@ -376,7 +376,7 @@ Header.prototype.render = function(opts){
 /* Shift the header X units to the right */
 Header.prototype.shift = function(amount, direction){
   var self = this;
- var amount = amount ? amount : 0;
+  amount = !!amount ? amount : 0;
   self.sheet.deleteRows(self.row, self.width);
   while(amount > 0){
     switch(direction){
@@ -443,7 +443,7 @@ function getAllDriveData(){
 */
 function getOAuthToken() {
   DriveApp.getRootFolder();
-  return DriveApp.getOAuthToken();;
+  return DriveApp.getOAuthToken();
 }
 /*************************************************************
 *                  * Testing Suite Functions *               *
@@ -533,7 +533,7 @@ function testHeader(){
     var Idx = Object.keys(idx);
     Idx.forEach(function(VAL){
       Logger.log(VAL);
-      var testIdx = Idx.indexOf(VAL, 0)
+      var testIdx = Idx.indexOf(VAL, 0);
       idx[VAL] = !isValidTestId ? randNat( dice[VAL].length ) : !!tesId[testIdx] && typeof testId[testIdx] == "number" ? testId[testIdx] : defaultTestIds[testIdx];
       Logger.log(idx[VAL]);
     });
