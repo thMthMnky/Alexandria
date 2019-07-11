@@ -449,9 +449,10 @@ function testColumns(){
 * Test for 'makeHeader'
 */
 function testHeader(){
-  var tests = {};
+  var dice = {};
+  var tests = {}; 
   var candidates = [];
-  var fails = [];
+  var fails = []; 
 
   function getFuncName() {
     return getFuncName.caller.name;
@@ -626,50 +627,6 @@ function testHeader(){
     return passedAll;
   }
   return RunTheTests();
-}
-
-function TestingSuite(opts){
-  this.opts = !!opts ? opts : {};
-  this.ss = null;
-  this.sheet = null;
-  this.lastRun = !!opts.lastRun ? opts.lastRun : {};
-  this.lastRun.date = !!opts.lastRun.date ? opts.lastRun.data : new Date();
-  this.lastRun.results = !!opts.lastRun.results ? opts.lastRun.results : true;
-}
-
-function getAllDriveData(){
-
-  // Log the name of every file in the user's Drive.
-  var allFiles = {};
-  var allFolders = {};
-  var drive_root;
-  try{
-    drive_root = DriveApp.getRootFolder();
-  }catch(e){
-    Logger.log(e);
-  }
-
-  function walk(folder, sep){
-     // Get folder data
-    var folderName = folder.getName();
-    var files = folder.getFiles();
-
-    while(files.hasNext()){
-      var file = files.next();
-      var fileId = file.getId();
-      var fileName = file.getName();
-      var fileType = file.getMimeType();
-
-      if(fileType != mimeTypes.folder){
-        allFiles[fileId] = [folderName + sep + fileName, fileType];
-      } else {
-        allFolders[folder.getId()] = folderName;
-        walk(file, sep);
-      }
-    }
-  }
-  walk(drive_root, ".");
-  return [allFiles, allFolders];
 }
 
 function testGetAllDriveData(){
