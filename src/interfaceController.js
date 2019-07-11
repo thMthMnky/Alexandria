@@ -2,7 +2,6 @@
  *  @OnlyCurrentDoc  Limits the script to only accessing the current spreadsheet.
  */
 
-
 /** 
  * Global UI Variables
  *
@@ -22,49 +21,8 @@ var HEADER_TEXT_VERT_ALIGNMENT = 'middle';
 var HEADER_FONT_SIZE = 14;
 var HEADER_COMPONENT_PRIMARY_COLOR ='#e6b8af';
 var HEADER_COMPONENT_SECONDARY_COLOR ='#e6b8af';
-<<<<<<< HEAD
-=======
 var HEADER_FONT_SIZE = 14;
 
-/**
- * Adds a custom menu with items to show the sidebar and dialog.
- *
- * @param {Object} e The event parameter for a simple onOpen trigger.
- */
-function onOpen() {
-  var ui = SpreadsheetApp.getUi();
-  ui 
-  .createMenu()
-  .addItem('GetDriveData', 'showUpLoadBar')
-  .addToUi();
-  
-  showUploadBar();
-}
-
-/**
- * Opens a sidebar. The sidebar structure is described in the Sidebar.html
- * project file.
- *
- * For example,
-
- function doGet(request) {
-  return HtmlService.createTemplateFromFile('Page')
-      .evaluate();
-}
-
-function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename)
-      .getContent();
-}
-
- */
-function showUpLoadBar() {
-  var ui = HtmlService.createTemplateFromFile('uploadBar')
-  .evaluate()
-  .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-  SpreadsheetApp.getUi().showSidebar(ui);
-}
->>>>>>> Header
 
 /**
  * Google book search volume model
