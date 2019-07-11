@@ -9,14 +9,13 @@ var SECONDARY_FONT_COLOR = '#0000000';
 var SECONDARY_COLOR = '#808080'; // Gray: (128,128,128)
 var TERNARYARY_COLOR = '#C0C0C0'; // Silver: (192,192,192)
 var SIDEDBAR_TITLE = 'Upload Data 2 Drive';
-var SIDEBAR_HEIGTH = '600px';
-var SIDEBAR_WIDTH = '400px';
+var SIDEBAR_HEIGTH = '600';
+var SIDEBAR_WIDTH = '400';
 var HEADER_TEXT_HORZ_ALIGNMENT = 'center';
 var HEADER_TEXT_VERT_ALIGNMENT = 'middle';
+var HEADER_FONT_SIZE = 14;
 var HEADER_COMPONENT_PRIMARY_COLOR ='#e6b8af';
 var HEADER_COMPONENT_SECONDARY_COLOR ='#e6b8af';
-var HEADER_FONT_SIZE = 14;
-
 /**
  * Adds a custom menu with items to show the sidebar and dialog.
  *
@@ -25,11 +24,9 @@ var HEADER_FONT_SIZE = 14;
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui 
-  .createMenu()
+  .createAddonMenu()
   .addItem('GetDriveData', 'showUpLoadBar')
   .addToUi();
-  
-  showUploadBar();
 }
 
 /**
@@ -245,7 +242,7 @@ function Columns(obj, sep, idx){
  *    
  * @test
  */
-function test_Columns(){
+function testColumns(){
   var columns = Columns(gVol, "_", 0);
   Object.keys(columns).forEach(function(col){
     Logger.log([col, columns[col]]);
@@ -286,7 +283,7 @@ Header.prototype.isEqualTo = function(obj){
 Header.prototype.render = function(opts){ 
   var self = this;
   self.ss =  opts && opts.ss ? opts.ss : SpreadsheetApp.getActiveSpreadsheet();
-  self.sheet = opts && opts.sheet ? opts.sheet: self.ss.getActiveSheet();
+  self.sheet = opts && opts.sheet ? opts.sheet: this.ss.getActiveSheet();
     
   function emptyStringArrayOfLength(num){
     var arr = [];
@@ -295,53 +292,46 @@ Header.prototype.render = function(opts){
   }
 
   var _header_rows = [self.index];
+  
   while(_header_rows.length < self.width){
     _header_rows.push(emptyStringArrayOfLength(self.index.length));
   }
+  
   _header_rows.reverse();
   
-  var _header_metadata = {};
-  var components = [{
-    name: "main",
-    range: (function (){ return self.sheet.getRange(self.row, self.column, self.width, self.index.length); })(),
-    values: _header_rows,
-    background: PRIMARY_COLOR,
-    fColor: PRIMARY_FONT_COLOR,
-    fHorz: HEADER_TEXT_HORZ_ALIGNMENT,
-    fVert: HEADER_TEXT_VERT_ALIGNMENT,
-    fSize: HEADER_FONT_SIZE
-  },
-  {
-    name: "componentFields",
-    range: self.sheet.getRange(self.row + 1, self.column + 1, 3, 1),
-    values: [['By:'], ['Date:'], ['\#\{Entries\}']],
-    background: HEADER_COMPONENT_PRIMARY_COLOR,
-    fColor: PRIMARY_FONT_COLOR,
-    fHorz: HEADER_TEXT_HORZ_ALIGNMENT,
-    fVert: HEADER_TEXT_VERT_ALIGNMENT,
-    fSize: HEADER_FONT_SIZE
-  },
-  {
-    name: "compoenentValues",
-    range: self.sheet.getRange(self.row + 1, self.column + 2, 3, 1),
-    values: [[self.updatedBy], [self.updatedDate], [self.updatedNum]],
-    background: HEADER_COMPONENT_SECONDARY_COLOR,
-    fColor: SECONDARY_FONT_COLOR,
-    fHorz: HEADER_TEXT_HORZ_ALIGNMENT,
-    fVert: HEADER_TEXT_VERT_ALIGNMENT,
-    fSize: HEADER_FONT_SIZE
-  }];
+  var _header = [
+    self.sheet.getRange(self.row, self.column, _header_rows.length, self.index.length), 
+    _header_rows
+  ];
   
-  function _render(type, range, values, background, fColor, fHorz, fVert, fSize){
-    range
-    .setBackground(background) 
-    .setFontColor(fColor)
-    .setHorizontalAlignment(fHorz)// 'center'
-    .setVerticalAlignment(fVert)// 'middle'
-    .setFontSize(fSize)// 14
-    .setValues(values);
-  }
-  _render(components[0].name, components[0].range(), components[0].values, components[0].background, components[0].fColor, components[0].fHorz, components[0].fVert, components[0].fSize );
+  // [TODO] Create a function to handle these background settings
+  _header[0]
+  .setBackground(PRIMARY_COLOR) 
+  .setFontColor(PRIMARY_FONT_COLOR)
+  .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
+  .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
+  .setFontSize(HEADER_FONT_SIZE)// 14
+  .setValues(_header[1]);
+
+  var _header_metadata = {};
+  _header_metadata.fields = [self.sheet.getRange(self.row + 1, self.column + 1, 3, 1), [['By:'], ['Date:'], ['\#\{Entries\}']]];
+  _header_metadata.values = [self.sheet.getRange(self.row + 1, self.column + 2, 3, 1), [[self.updatedBy], [self.updatedDate], [self.updatedNum]]];
+  
+  _header_metadata.fields[0]
+  .setBackground(HEADER_COMPONENT_PRIMARY_COLOR)
+  .setFontColor(PRIMARY_FONT_COLOR)
+  .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
+  .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
+  .setFontSize(HEADER_FONT_SIZE)// 14
+  .setValues(_header_metadata.fields[1]);
+
+  _header_metadata.values[0]
+  .setBackground(HEADER_COMPONENT_SECONDARY_COLOR)
+  .setFontColor(SECONDARY_FONT_COLOR)
+  .setHorizontalAlignment(HEADER_TEXT_HORZ_ALIGNMENT)// 'center'
+  .setVerticalAlignment(HEADER_TEXT_VERT_ALIGNMENT)// 'middle'
+  .setFontSize(HEADER_FONT_SIZE)// 14
+  .setValues(_header_metadata.values[1]);
 };
 
 /* Shift the header X units to the right */ 
@@ -382,20 +372,21 @@ Header.prototype.update = function(){};
  * Test for 'makeHeader'
  */
 function testHeader(){
+  var dice = {};
+  var tests = {}; 
   var candidates = [];
-  var tests = []; 
   var fails = []; 
 
   function getFuncName() {
     return getFuncName.caller.name;
   }
   
-  function getTest(params){
-    var testId = !!params? params: [];
+  function getTest(testId){
+    var defaultTestIds = [4, 4, 5, 0, 0];
 
     // Test-object model
     var testModel = {
-      vols: null,
+      vol: null,
       opts: {
         ss: null,
         sheet: null,
@@ -404,46 +395,70 @@ function testHeader(){
           col: null,
         },
         width: null
-      }  
+      }
     };
 
-    // Given an arbitrary positive integer, N, this function will return and randon integer in the interval [0,N) 
-    var randInt = function(N) { return Math.floor(N*Math.random()); };
+    var idx = {};
+    idx.vol = 0;
+    idx.ss = 1;
+    idx.sheet = 2;
+    idx.row = 3;
+    idx.col = 4;
+    idx.width = 5;
+
+    // Given an arbitrary natuaral number, N, this function will return a 'random' second natuaral number in the interval [0,N) 
+    var randNat = function(maxSize) { return Math.floor(maxSize*Math.random()); };
     
     // Common initialization values
     var Opts = [null, "", [], {} ];
 
     // Create a die
-    var dice = [
-      Opts.concat([gVol]),
-      Opts.concat([SpreadsheetApp.getActiveSpreadsheet()]),
-      Opts.concat([SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(), SpreadsheetApp.getActiveSheet()]),
-      Opts.concat([NaN, 0, randInt(N), -1*randInt(N)]),
-      Opts.concat([NaN, 0, randInt(N), -1*randInt(N)]),
-      Opts.concat([NaN, 0, randInt(N), -1*randInt(N)]) 
-    ];
-
-    if( testId.constructor.name != "Array" || testId === [] || testId === null){
-
-      // Roll the dice
-      testModel.vols = dice[0][ randInt( dice[0].length )];
-      testModel.opts.ss = dice[1][ randInt( dice[1].length )];
-      testModel.opts.sheet = dice[2][ randInt( dice[2].length )];
-      testModel.opts.start.row = dice[3][ randInt( dice[3].length )];
-      testModel.opts.start.col = dice[4][ randInt( dice[4].length )];
-      testModel.opts.width = dice[5][ randInt( dice[5].length )];
-      
-    }else{
-
-      // Accept correct params or Set 'safe' defaults
-      testModel.vols = !!tesId[0] ? dice[0][ testId[0] ] : dice[0][4];
-      testModel.opts.ss = !!tesId[1] ? dice[1][ testId[1]] : dice[1][4];
-      testModel.opts.sheet = !!tesId[2] ? dice[2][ testId[2]] : dice[2][5];
-      testModel.opts.start.row = !!tesId[3] ? dice[3][ testId[3]] : dice[3][0];
-      testModel.opts.start.col = !!tesId[4] ? dice[4][ testId[4]] : dice[4][0];
-      testModel.opts.width = !!tesId[5] ? dice[5][ testId[5]] : dice[5][0];
+    dice.vol = Opts.concat([gVol]);
+    try{
+      dice.ss = Opts.concat([SpreadsheetApp.getActiveSpreadsheet()]);
+    }catch(e){
+      fails.push(e);
+      // Logger.log(e);
     }
 
+    try{
+      dice.sheet = Opts.concat([dice.ss[4].getActiveSheet(), SpreadsheetApp.getActiveSheet()]);
+    }catch(e){
+      fails.push(e);
+      // Logger.log(e);
+    }
+    dice.row = Opts.concat([NaN, 0, randNat(10), -1*randNat(8)]);
+    dice.col = Opts.concat([NaN, 0, randNat(9), -1*randNat(11)]);
+    dice.width = Opts.concat([NaN, 0, randNat(3), -1*randNat(5)]);
+
+    // Set the index based on 'testId' parameters
+    var isValidTestId = testId.constructor.name != "Array" || testId === null;
+    var Idx = Object.keys(idx);
+    Idx.forEach(function(VAL){
+      Logger.log(VAL);
+      var testIdx = Idx.indexOf(VAL, 0)
+      idx[VAL] = !isValidTestId ? randNat( dice[VAL].length ) : !!tesId[testIdx] && typeof testId[testIdx] == "number" ? testId[testIdx] : defaultTestIds[testIdx];
+      Logger.log(idx[VAL]);
+    });
+
+    /** [DEP] Keep until we confirm the corresponding section is confirmed to have worked as intended*/ 
+
+    // // Set the index based on 'testId' parameters
+    // vols_Idx = !isValidTestId ? randNat( dice.vol.length ) : !!tesId[0] && typeof testId[0] == "number" ? testId[0] : 4;
+    // ss_Idx = !isValidTestId ? randNat( dice.ss.length ) : !!tesId[1]  && typeof testId[1] == "number" ? testId[1] : 4 ;
+    // sheet_Idx = !isValidTestId ? randNat( dice.sheet.length ) : !!tesId[2]  && typeof testId[2] == "number" ? testId[2] : 5;
+    // row_Idx = !isValidTestId ? randNat( dice.row.length ) : !!tesId[3]  && typeof testId[3] == "number" ? testId[3] : 0;
+    // col_Idx = !isValidTestId ? randNat( dice.col.length ) : !!tesId[4]  && typeof testId[4] == "number" ? testId[4] : 0;
+    // width_Idx = !isValidTestId ? randNat( dice.width.length ) : !!tesId[5]  && typeof testId[5] == "number" ? testId[5] : 0;
+
+    // Accept correct params or Set 'safe' defaults
+    testModel.vols = dice.vol[ idx.vol ];
+    testModel.opts.ss = dice.ss[ idx.ss ];
+    testModel.opts.sheet = dice.sheet[ idx.sheet ];
+    testModel.opts.start.row = dice.row[ idx.row ];
+    testModel.opts.start.col = dice.col[ idx.col ];
+    testModel.opts.width = dice.width[ idx.width ];
+    
     return testModel;
   }
   
@@ -454,9 +469,13 @@ function testHeader(){
        * "Before I begin runnning the tests, I will create "
        * */ 
     try{
-      SpreadsheetApp.getActiveSheet().clear();
+      // Getting the Active SpreadSheet
+      SpreadsheetApp.getActiveSpreadsheet();
+
+      // Create a new sheet
+
     }catch(e){
-      Logger.log(e);
+      // Logger.log(e);
     }
   }
 
@@ -466,15 +485,14 @@ function testHeader(){
    * 
    * */
   function beforeEach(current_idx){
-    tests[current_idx] = getRandomTest();
-
+    tests[current_idx] = getTest([null, null, null, ]);
     try{
       headings = Columns(tests[current_idx].vols, " ", 0);
       options = tests[current_idx].opts;
       candidates.push(new Header(headings, options));
     }catch(e){
       fails.push("Failed " + beforeEach.name + " @ index " + current_idx  + " with error: " + e);
-      Logger.log(e);
+      // Logger.log(e)
     }
   }
 
@@ -488,8 +506,8 @@ function testHeader(){
     try{
      testResults = candidates[current_idx].isEqualTo(candidates[current_idx -1]);
     }catch(e){
-      fails.push("Failed " + testing.name + " @ index " + current_idx  + " with error: " + e);
-      Logger.log(e);
+      fails.push("Failed " + testingRender.name + " @ index " + current_idx  + " with error: " + e);
+      // Logger.log(e);
     }
     Logger.log(testResults);
     return testResults;
@@ -500,7 +518,7 @@ function testHeader(){
       candidates[current_idx].render();
     }catch(e){
       fails.push("Failed " + afterEach.name + " @ index " + current_idx  + " with error: " + e);
-      Logger.log(e);
+      // Logger.log(e);
     }
   }
   
@@ -534,10 +552,9 @@ function getAllDriveData(){
   }
   
   function walk(folder, sep){
-    // Get folder data
+     // Get folder data
     var folderName = folder.getName();
     var files = folder.getFiles();
-
 
     while(files.hasNext()){
       var file = files.next();
