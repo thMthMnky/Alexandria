@@ -9,14 +9,9 @@
  */
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
-<<<<<<< HEAD
-  ui
-  .createMenu()
-=======
 
   ui
   .createAddonMenu()
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
   .addItem('GetDriveData', 'showUpLoadBar')
   .addToUi();
 
@@ -47,42 +42,6 @@ function showUpLoadBar() {
   SpreadsheetApp.getUi().showSidebar(ui);
 }
 
-<<<<<<< HEAD
-function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename)
-      .getContent();
-}
-
-// Prevent forms from submitting.
-function preventFormSubmit() {
-  var forms = document.querySelectorAll('form');
-  for (var i = 0; i < forms.length; i++) {
-    forms[i].addEventListener('submit', function(event) {
-      event.preventDefault();
-    });
-  }
-}
-/** 
- * Global Variables
- *
- */
-var COLUMN_WIDTH = '16px';
-var ROW_HEIGHT = '32px';
-var PRIMARY_COLOR = '#8B0000'; // Dark Red: (139,0,0)
-var PRIMARY_FONT_COLOR = '#ffffff'; // White: (255,255,255)
-var SECONDARY_FONT_COLOR = '#0000000';
-var SECONDARY_COLOR = '#808080'; // Gray: (128,128,128)
-var TERNARYARY_COLOR = '#C0C0C0'; // Silver: (192,192,192)
-var SIDEDBAR_TITLE = 'Upload Data 2 Drive';
-var SIDEBAR_HEIGTH = '600';
-var SIDEBAR_WIDTH = '400';
-var HEADER_TEXT_HORZ_ALIGNMENT = 'center';
-var HEADER_TEXT_VERT_ALIGNMENT = 'middle';
-var HEADER_FONT_SIZE = 14;
-var HEADER_COMPONENT_PRIMARY_COLOR ='#e6b8af';
-var HEADER_COMPONENT_SECONDARY_COLOR ='#e6b8af';
-=======
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
 
 /**
  * Google book search volume model
@@ -277,13 +236,7 @@ function Header(columns, opts){
   this.row = opts && opts.start.row ? opts.start.row : 1;
   this.column = opts && opts.start.column ? opts.start.column : 1;
   this.width = opts && opts.width ? opts.width : 1;
-<<<<<<< HEAD
-  this.updatedBy = "";
-  this.updatedDate = Date.now();
-  this.updatedNum = "";
-=======
   this.update = { by: "", data: null, num: 0};
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
 }
 
 Header.prototype.isEqualTo = function(obj){
@@ -301,9 +254,6 @@ Header.prototype.isEqualTo = function(obj){
 Header.prototype.render = function(opts){
   var self = this;
   self.ss =  opts && opts.ss ? opts.ss : SpreadsheetApp.getActiveSpreadsheet();
-<<<<<<< HEAD
-  self.sheet = opts && opts.sheet ? opts.sheet: self.ss.getActiveSheet();
-=======
   self.sheet = opts && opts.sheet ? opts.sheet : self.ss.getActiveSheet();
 
   function _render(type, range, values, background, fColor, fHorz, fVert, fSize){
@@ -315,7 +265,6 @@ Header.prototype.render = function(opts){
     .setFontSize(fSize)
     .setValues(values);
   }
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
 
   function emptyStringArrayOfLength(num){
     var arr = [];
@@ -342,13 +291,8 @@ Header.prototype.render = function(opts){
     fSize: HEADER_FONT_SIZE
   },
   {
-<<<<<<< HEAD
-    name: "componentFields",
-    range: self.sheet.getRange(self.row + 1, self.column + 1, 3, 1),
-=======
     name: "updateFields",
     range: (function (){return self.sheet.getRange(self.row + 1, self.column + 1, 3, 1); })(),
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
     values: [['By:'], ['Date:'], ['\#\{Entries\}']],
     background: HEADER_COMPONENT_PRIMARY_COLOR,
     fColor: PRIMARY_FONT_COLOR,
@@ -357,15 +301,9 @@ Header.prototype.render = function(opts){
     fSize: HEADER_FONT_SIZE
   },
   {
-<<<<<<< HEAD
-    name: "compoenentValues",
-    range: self.sheet.getRange(self.row + 1, self.column + 2, 3, 1),
-    values: [[self.updatedBy], [self.updatedDate], [self.updatedNum]],
-=======
     name: "updateValues",
     range: (function (){ return self.sheet.getRange(self.row + 1, self.column + 2, 3, 1); })(),
     values: [[self.updated.by], [self.updated.date], [self.updated.num]],
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
     background: HEADER_COMPONENT_SECONDARY_COLOR,
     fColor: SECONDARY_FONT_COLOR,
     fHorz: HEADER_TEXT_HORZ_ALIGNMENT,
@@ -373,25 +311,9 @@ Header.prototype.render = function(opts){
     fSize: HEADER_FONT_SIZE
   }];
 
-<<<<<<< HEAD
-  function _render(type, range, values, background, fColor, fHorz, fVert, fSize){
-    range()
-    .setBackground(background)
-    .setFontColor(fColor)
-    .setHorizontalAlignment(fHorz)// 'center'
-    .setVerticalAlignment(fVert)// 'middle'
-    .setFontSize(fSize)// 14
-    .setValues(values);
-  }
-
-  for( var i = 0; i < components.length ){
-   _render(components[i].name,
-	  components[i].range(),
-=======
-  for( var i = 0; i < components.length ){
+  for( var i = 0; i < components.length; i++ ){
    _render(components[i].name,
 	  components[i].range,
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
 	  components[i].values,
 	  components[i].background,
 	  components[i].fColor,
@@ -439,57 +361,17 @@ Header.prototype.update = function(){};
  * Test for 'makeHeader'
  */
 function testHeader(){
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-  var dice = {};
-  var tests = {};
-  var candidates = [];
-  var tests = [];
-  var fails = [];
-=======
-=======
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
-  var dice = {};
-  var tests = {}; 
-  var candidates = [];
-  var fails = []; 
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
-=======
   var tests = {};
   var candidates = [];
   var fails = [];
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
 
   function getFuncName() {
     return getFuncName.caller.name;
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-  function getTest(testId){
-    var defaultTestId = [4, 4, 5, 0, 0];
-=======
-  
-<<<<<<< HEAD
-<<<<<<< HEAD
-  function getTest(params){
-    var testId = !!params? params: [];
->>>>>>> [WIP] Building Testing Framework: TestApi Endpoints
-=======
-  function getTest(testId){
-    var defaultTestIds = [4, 4, 5, 0, 0];
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
-=======
 
   function getTest(testId){
     var defaultTestIds = [4, 4, 5, 5, 5];
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
-=======
-  function getTest(testId){
-    var defaultTestIds = [4, 4, 5, 0, 0];
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
 
     // Test-object model
     var testModel = {
@@ -505,13 +387,6 @@ function testHeader(){
       }
     };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
-=======
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
     var idx = {};
     idx.vol = 0;
     idx.ss = 1;
@@ -520,50 +395,17 @@ function testHeader(){
     idx.col = 4;
     idx.width = 5;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     // Given an arbitrary natuaral number, N, this function will return a 'random' second natuaral number in the interval [0,N) 
     var randNat = function(maxSize) { return Math.floor(maxSize*Math.random()); };
-<<<<<<< HEAD
 
-=======
-    // Given an arbitrary positive integer, N, this function will return and randon integer in the interval [0,N) 
-    var randInt = function(N) { return Math.floor(N*Math.random()); };
-=======
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
-=======
-    // Given an arbitrary natuaral number, N, this function will return a 'random' second natuaral number in the interval [0,N) 
-    var randNat = function(maxSize) { return Math.floor(maxSize*Math.random()); };
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
-    
->>>>>>> [WIP] Building Testing Framework: TestApi Endpoints
     // Common initialization values
     var Opts = [null, "", [], {} ];
-=======
+
     function getDice(opts){
       var dice = {};
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
 
       // Given an arbitrary natuaral number, N, this function will return a 'random' second natuaral number in the interval [0,N) 
       var randNat = function(maxSize) { return Math.floor(maxSize*Math.random()); };
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-    /** [DEP] Keep until we confirm the corresponding section is confirmed to have worked as intended*/ 
-=======
-    try{
-      dice.sheet = Opts.concat([dice.ss[4].getActiveSheet(), SpreadsheetApp.getActiveSheet()]);
-    }catch(e){
-      fails.push(e);
-      // Logger.log(e);
-    }
-    dice.row = Opts.concat([NaN, 0, randNat(10), -1*randNat(8)]);
-    dice.col = Opts.concat([NaN, 0, randNat(9), -1*randNat(11)]);
-    dice.width = Opts.concat([NaN, 0, randNat(3), -1*randNat(5)]);
-=======
-      // Common initialization values
-      var Opts = [null, "", [], {} ];
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
 
       // Create a die
       dice.vol = Opts.concat([gVol]);
@@ -574,18 +416,6 @@ function testHeader(){
         // Logger.log(e);
       }
 
-<<<<<<< HEAD
-      try{
-        dice.sheet = Opts.concat([dice.ss[4].getActiveSheet(), SpreadsheetApp.getActiveSheet()]);
-      }catch(e){
-        fails.push(e);
-        // Logger.log(e);
-      }
-      dice.row = Opts.concat([NaN, 0, randNat(10), -1*randNat(8)]);
-      dice.col = Opts.concat([NaN, 0, randNat(9), -1*randNat(11)]);
-      dice.width = Opts.concat([NaN, 0, randNat(3), -1*randNat(5)]);
-    }
-=======
     // Create a die
     dice.vol = Opts.concat([gVol]);
     try{
@@ -605,13 +435,12 @@ function testHeader(){
     dice.col = Opts.concat([NaN, 0, randNat(9), -1*randNat(11)]);
     dice.width = Opts.concat([NaN, 0, randNat(3), -1*randNat(5)]);
 
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
+
     // Set the index based on 'testId' parameters
     var isValidTestId = testId.constructor.name != "Array" || testId === null;
     var Idx = Object.keys(idx);
     Idx.forEach(function(VAL){
-<<<<<<< HEAD
-<<<<<<< HEAD
+
       Logger.log(VAL);
 
       var testIdx = Idx.indexOf(VAL, 0)
@@ -619,28 +448,7 @@ function testHeader(){
       Logger.log(idx[VAL]);
     });
 
-<<<<<<< HEAD
-    /** [DEP] Keep until we confirm the corresponding section is confirmed to work */ 
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
-=======
     /** [DEP] Keep until we confirm the corresponding section is confirmed to have worked as intended*/ 
->>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
-=======
-      var testIdx = Idx.indexof(VAL);
-=======
-      Logger.log(VAL);
-      var testIdx = Idx.indexOf(VAL, 0)
->>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
-      idx[VAL] = !isValidTestId ? randNat( dice[VAL].length ) : !!tesId[testIdx] && typeof testId[testIdx] == "number" ? testId[testIdx] : defaultTestIds[testIdx];
-      Logger.log(idx[VAL]);
-    });
-
-<<<<<<< HEAD
-    /** [DEP] Keep until we confirm the corresponding section is confirmed to work */ 
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
-=======
-    /** [DEP] Keep until we confirm the corresponding section is confirmed to have worked as intended*/ 
->>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
 
     // // Set the index based on 'testId' parameters
     // vols_Idx = !isValidTestId ? randNat( dice.vol.length ) : !!tesId[0] && typeof testId[0] == "number" ? testId[0] : 4;
@@ -650,151 +458,98 @@ function testHeader(){
     // col_Idx = !isValidTestId ? randNat( dice.col.length ) : !!tesId[4]  && typeof testId[4] == "number" ? testId[4] : 0;
     // width_Idx = !isValidTestId ? randNat( dice.width.length ) : !!tesId[5]  && typeof testId[5] == "number" ? testId[5] : 0;
 
-<<<<<<< HEAD
 
     // Accept correct params or Set 'safe' defaults
     testModel.vol = dice.vol[ idx.vol ];
-=======
-    // Accept correct params or Set 'safe' defaults
-    testModel.vols = dice.vol[ idx.vol ];
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
     testModel.opts.ss = dice.ss[ idx.ss ];
     testModel.opts.sheet = dice.sheet[ idx.sheet ];
     testModel.opts.start.row = dice.row[ idx.row ];
     testModel.opts.start.col = dice.col[ idx.col ];
     testModel.opts.width = dice.width[ idx.width ];
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
-=======
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
-=======
-    
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
     return testModel;
   }
 
   function before(){
-<<<<<<< HEAD
+
       /**
        * [TODO] Create a sheet in which to run the tests
        *
        * "Before I begin runnning the tests, I will create "
        * */
-=======
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
+
     try{
       // Getting the Active SpreadSheet
-<<<<<<< HEAD
       Logger.log("In 'before' but it doesn't do anything just yet")
-      tests[i] = getTest([null, null, null, 4, 5, 6]);
-      // Create a new sheet
-
-=======
       SpreadsheetApp.getActiveSpreadsheet();
 
       // Create a new sheet
 
-<<<<<<< HEAD
       // Create 
     tests[current_idx] = getTest([null, null, null, ]);
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
+
     }catch(e){
        Logger.log("There was an error in the before function. The following error was thrown: "+e);
-=======
-    }catch(e){
-      // Logger.log(e);
->>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
+
     }
   }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-  /**
-   * [TODO]
-   *
-   *
-=======
   /** 
    * [TODO] 
    * 
    * 
->>>>>>> [WIP] Building Testing Framework: TestApi Endpoints
    * */
-=======
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
+
   function beforeEach(current_idx){
-<<<<<<< HEAD
-<<<<<<< HEAD
 
     tests[current_idx] = getTest([null, null, null, ]);
-=======
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice Roll
 
-=======
-    tests[current_idx] = getTest([null, null, null, ]);
->>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
     try{
       headings = Columns(tests[current_idx].vols, "__t ${ current_idx } t__", 0);
       options = tests[current_idx].opts;
       candidates.push(new Header(headings, options));
     }catch(e){
-<<<<<<< HEAD
+
       fails.push("Failed " + getFuncName() + " @ index " + current_idx  + " with error: " + e);
-=======
-      fails.push("Failed " + beforeEach.name + " @ index " + current_idx  + " with error: " + e);
->>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
+
       // Logger.log(e)
     }
   }
 
-<<<<<<< HEAD
   /**
    * [TODO] Run the test
    *
    * "For the candidate at position @current_idx , "
    * */
-=======
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
+
   function testingRender(current_idx){
     var testResults = true;
     try{
      testResults = candidates[current_idx].render();
 	// this shoud simply test if the test was rendered
     }catch(e){
-<<<<<<< HEAD
+
       fails.push("Failed " + getFuncName() + " @ index " + current_idx  + " with error: " + e);
 
-=======
-      fails.push("Failed " + testingRender.name + " @ index " + current_idx  + " with error: " + e);
->>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
+
       // Logger.log(e);
     }
     Logger.log(testResults);
     return testResults;
   }
 
-<<<<<<< HEAD
-=======
+
   function testingShift(current_idx){
     var testResults = true;
     return testResults;
  }
 
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
   function afterEach(current_idx){
     try{
       candidates[current_idx].render();
     }catch(e){
-<<<<<<< HEAD
       fails.push("Failed " + getFuncName() + " @ index " + current_idx  + " with error: " + e);
-=======
-      fails.push("Failed " + afterEach.name + " @ index " + current_idx  + " with error: " + e);
->>>>>>> [WIP] Building Testing Framework: Collecting Errors instead of Logging Them
+
       // Logger.log(e);
     }
   }
@@ -815,10 +570,7 @@ function testHeader(){
     after();
     return passedAll;
   }
-<<<<<<< HEAD
 
-=======
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
   return RunTheTests();
 }
 
@@ -836,17 +588,13 @@ function getAllDriveData(){
   // Log the name of every file in the user's Drive.
   var allFiles = {};
   var allFolders = {};
-<<<<<<< HEAD
   var drive_root;
   try{
     drive_root = DriveApp.getRootFolder();
   }catch(e){
     Logger.log(e);
   }
-  
-=======
 
->>>>>>> [WIP] Building Testing Framework: Refactoring the Dice into a class
   function walk(folder, sep){
      // Get folder data
     var folderName = folder.getName();
