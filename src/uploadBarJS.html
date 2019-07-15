@@ -63,7 +63,7 @@
   *               div.innerHTML = '<a href="' + urlString + '">Got it!</a>';
   *             } 
   * */ 
-  google.script.run
+  var x = google.script.run
     .withSuccessHandler(
 //          function(msg, element) {
 //            // Respond to success conditions here.
@@ -90,34 +90,34 @@
   // }
 }
 
-}
-    gapi.load('filePickerExampleGS', {
-        'callback': function() {
-            pickerApiLoaded = true;
-        }
-    });
-    google.script.run.withSuccessHandler(createPicker)
-        .withFailureHandler(showStatus)
-        .withUserObject(this)
-        .getOAuthToken();
-   
-    // // Send the value to the server and handle the response.
-    // google.script.run
-    //     .withSuccessHandler(
-    //       function(msg, element) {
-    //         // Respond to success conditions here.
-    //         $('#sidebar-value').val(msg);
-    //         showStatus('Pulled value successfully.');
-    //         element.disabled = false;
-    //       })
-    //     .withFailureHandler(
-    //       function(msg, element) {
-    //         // Respond to failure conditions here.
-    //         showStatus(msg, 'error');
-    //         element.disabled = false;
-    //       })
-    //     .getAllDriveData();
-  }
+
+  gapi.load('filePickerExampleGS', {
+      'callback': function() {
+          pickerApiLoaded = true;
+      }
+  });
+  google.script.run.withSuccessHandler(createPicker)
+      .withFailureHandler(showStatus)
+      .withUserObject(this)
+      .getOAuthToken();
+  
+  // // Send the value to the server and handle the response.
+  // google.script.run
+  //     .withSuccessHandler(
+  //       function(msg, element) {
+  //         // Respond to success conditions here.
+  //         $('#sidebar-value').val(msg);
+  //         showStatus('Pulled value successfully.');
+  //         element.disabled = false;
+  //       })
+  //     .withFailureHandler(
+  //       function(msg, element) {
+  //         // Respond to failure conditions here.
+  //         showStatus(msg, 'error');
+  //         element.disabled = false;
+  //       })
+  //     .getAllDriveData();
+
   
   function createPicker(token) {
     if (pickerApiLoaded && !!token) {
