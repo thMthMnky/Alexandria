@@ -1,9 +1,8 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript">
-
   var DIALOG_DIMENSIONS = {
-      width: 600,
-      height: 425
+    width: 600,
+    height: 425
   };
 
   var pickerApiLoaded = false;
@@ -11,157 +10,86 @@
   /**
    * Run initializations on sidebar load.
    */
-  $(function() {
+  $(function () {
     // Assign handler functions to sidebar elements here, if needed.
-    $('#sidebar-pull-button').click(onClick);
+    $('#gas_ss_get').click(onClick);
 
   });
-  
 
-  /**
-    * Calls the server to retrieve information from the sheet.
-   * Gets the value in the active cell, which is then placed in the
-   * sidebar text field.
-   */
   function onClick() {
     this.disabled = true;
 
-  //   /**
-  //    * Return a list of book volumes matching a give query string
-  //    * @see https://developers.google.com/books/docs/v1/reference/volumes/list 
-  //    */
-  //  function match(str, opts, callback){
-  //   var volume_name = str;
-  //   var {version, author, tag} = ops;
-  //   var cbFunction = callback;
-    
-  //   var query = '"root" in parents and trashed = false and ' +
-  //     'mimeType = "application/vnd.google-apps.folder"';
-  //   var pageToken;
-  //   var folders = Drive.Files.list({
-  //     q: query,
-  //     maxResults: 100,
-  //     pageToken: pageToken
-  //   });
-  //   Logger.log(folders);
-  //  }
 
-  /** 
-  * [TODO] Send the value to the server and handle the response.
-  * 
-  * For @example:
-  * 
-  *          @function handleFormSubmit(
-  *            @params formObject 
-  *            @runs google.script.run.withSuccessHandler(updateUrl).processForm(formObject);
-  *            @returns urlString
-  * 
-  *           @function updateUrl
-  *             @params urlString 
-  *             @runs {
-  *               var div = document.getElementById('output');
-  *               div.innerHTML = '<a href="' + urlString + '">Got it!</a>';
-  *             } 
-  * */ 
-  var x = google.script.run
-    .withSuccessHandler(
-//          function(msg, element) {
-//            // Respond to success conditions here.
-//            $('#sidebar-value').val(msg);
-//            showStatus('Pulled value successfully.');
-//            element.disabled = true;
-//          }
-      )
-    .withFailureHandler(
-//          function(msg, element) {
-//            // Respond to failure conditions here.
-//            showStatus(msg, 'error');
-//            element.disabled = false;
-//          }
-      )
-    .withUserObject(this)
-    .getAllDriveData();  
-    
-  //   function(msg, element) {
-  //   // Respond to success conditions here.
-  //   $('#sidebar-value').val(msg);
-  //   showStatus('Pulled value successfully.');
-  //   element.disabled = true;
-  // }
-}
-
-
-  gapi.load('filePickerExampleGS', {
-      'callback': function() {
-          pickerApiLoaded = true;
-      }
-  });
-  google.script.run.withSuccessHandler(createPicker)
+    google.script.run.withSuccessHandler(createPicker)
       .withFailureHandler(showStatus)
       .withUserObject(this)
       .getOAuthToken();
-  
-  // // Send the value to the server and handle the response.
-  // google.script.run
-  //     .withSuccessHandler(
-  //       function(msg, element) {
-  //         // Respond to success conditions here.
-  //         $('#sidebar-value').val(msg);
-  //         showStatus('Pulled value successfully.');
-  //         element.disabled = false;
-  //       })
-  //     .withFailureHandler(
-  //       function(msg, element) {
-  //         // Respond to failure conditions here.
-  //         showStatus(msg, 'error');
-  //         element.disabled = false;
-  //       })
-  //     .getAllDriveData();
 
-  
+  }
+
   function createPicker(token) {
     if (pickerApiLoaded && !!token) {
 
-        var docsView = new google.picker.DocsView()
-            .setIncludeFolders(true)
-            .setMimeTypes('application/vnd.google-apps.folder')
-            .setSelectFolderEnabled(true);
+      var docsView = new google.picker.DocsView()
+        .setIncludeFolders(true)
+        .setMimeTypes('application/vnd.google-apps.folder')
+        .setSelectFolderEnabled(true);
 
-        var picker = new google.picker.PickerBuilder()
-            .addView(docsView)
-            .enableFeature(google.picker.Feature.NAV_HIDDEN)
-            .hideTitleBar()
-            .setSize(DIALOG_DIMENSIONS.width - 2, DIALOG_DIMENSIONS.height - 2)
-            .setOAuthToken(token)
-            .setCallback(pickerCallback)
-            .setOrigin('https://docs.google.com')
-            .build();
+      var picker = new google.picker.PickerBuilder()
+        .addView(docsView)
+        .enableFeature(google.picker.Feature.NAV_HIDDEN)
+        .hideTitleBar()
+        .setSize(DIALOG_DIMENSIONS.width - 2, DIALOG_DIMENSIONS.height - 2)
+        .setOAuthToken(token)
+        .setCallback(pickerCallback)
+        .setOrigin('https://docs.google.com')
+        .build();
 
-        picker.setVisible(true);
+      picker.setVisible(true);
 
     } else {
-        showStatus('Unable to load the file picker.', classId)
+      showStatus('Unable to load the file picker.', classId)
     }
   }
-  
-     /**
-    * A callback function that extracts the chosen document's metadata from the
-    * response object. For details on the response object, see
-    * https://developers.google.com/picker/docs/result
-    *
-    * @param {object} data The response object.
-    */
-   function pickerCallback(data) {
-       var action = data[google.picker.Response.ACTION];
-       if (action == google.picker.Action.PICKED) {
-          //  var doc = data[google.picker.Response.DOCUMENTS][0];
-          //  var id = doc[google.picker.Document.ID];
-           showStatus(`First item: ${id}`);
-       } else if (action == google.picker.Action.CANCEL) {
-           google.script.host.close();
-       }
-   }
 
+  /**
+   * A callback function that extracts the chosen document's metadata from the
+   * response object. For details on the response object, see
+   * https://developers.google.com/picker/docs/result
+   *
+   * @param {object} data The response object.
+   */
+  function pickerCallback(data) {
+    var action = data[google.picker.Response.ACTION];
+    if (action == google.picker.Action.PICKED) {
+      //  var doc = data[google.picker.Response.DOCUMENTS][0];
+      //  var id = doc[google.picker.Document.ID];
+      showStatus(`First item: ${id}`);
+            
+    google.script.run
+      .withSuccessHandler(
+        handleDriveData
+      )
+      .withFailureHandler(
+        function (msg, element) {
+          // Respond to failure conditions here.
+          showStatus(msg, 'error');
+          element.disabled = false;
+        }
+      )
+      .withUserObject(this)
+      .getAllDriveData(); 
+    } else if (action == google.picker.Action.CANCEL) {
+      google.script.host.close();
+    }
+  }
+
+  function handleDriveData(data) {
+    var DriveData = data? data: {allFiles: [], allFolders: []};
+    if( !!DriveData.allFiles && !!DriveData.allFolders && DriveData.allFiles.constructor.name === "array" && DriveData.allFolders.constructor.name === "array"){
+      showStatus('YOU GOT THHE DRIVE DATA!! GOOOD JOB')
+    }
+  }
   /**
    * Displays the given status message in the sidebar.
    *
@@ -175,5 +103,4 @@
       $('#sidebar-status').addClass(classId);
     }
   }
-
 </script>

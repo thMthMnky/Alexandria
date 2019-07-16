@@ -236,16 +236,6 @@ function include(filename) {
       .getContent();
 }
 
-// Prevent forms from submitting.
-function preventFormSubmit() {
-  var forms = document.querySelectorAll('form');
-  for (var i = 0; i < forms.length; i++) {
-    forms[i].addEventListener('submit', function(event) {
-      event.preventDefault();
-    });
-  }
-}
-
 /**
  * Displays an HTML-service dialog in Google Sheets that contains client-side
  * JavaScript code for the Google Picker API.

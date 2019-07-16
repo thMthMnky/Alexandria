@@ -1,31 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+      <meta charset="utf-8">
     <base target="_top">
     <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
     <?!= HtmlService.createHtmlOutputFromFile('Stylesheet').getContent(); ?>
     <script>
-      /** [DEP] Keep until the button populates the Active Spreadsheet */
-      // // Prevent forms from submitting.
-      // function preventFormSubmit() {
-      //   var forms = document.querySelectorAll('form');
-      //   for (var i = 0; i < forms.length; i++) {
-      //     forms[i].addEventListener('submit', function(event) {
-      //       event.preventDefault();
-      //     });
-      //   }
-      // }
-      
-      window.addEventListener('load', preventFormSubmit);
-      
-      /** [DEP] Keep until the button populates the Active Spreadsheet */
-      // function handleFormSubmit(formObject) {
-      //   google.script.run.withSuccessHandler(updateUrl).processForm(formObject);
-      // }
-      // function updateUrl(url) {
-      //   var div = document.getElementById('output');
-      //   div.innerHTML = '<a href="' + url + '">Got it!</a>';
-      // }
+  
+        // window.addEventListener('load', preventFormSubmit);
 
     </script>
   </head>
@@ -34,30 +17,12 @@
       
       <p> This sidebar allows you to add either a folder or a file from Drive. </p>
       <div>
-        <button type="button" id="gas_ss_get" onclick="getAllDriveData()">Click-and-get-data</button>
+        <button type="button" id="gas_ss_get" >Click-and-get-data</button>
         <input>
       </div>
-<!-- 
-      <div class="block form-group" id="sidebar-value-block">
-        <label for="sidebar-value">Sidebar value:</label>
-        <input id="sidebar-value" value="37">
-      </div>
 
-      <div class="block" id="sidebar-button-bar">
-        <button id="sidebar-pull-button">Add Books</button>      
-      </div>
+      <div id="sidebar-status"></div> 
 
-      <div id="sidebar-status"></div> -->
-      
-      <!-- [DEP] Keep until the button populates the Active Spreadsheet -->
-      <!-- <form id="myForm" onsubmit="handleFormSubmit(this)">
-        <input name="myFile" type="file" />
-        <input type="submit" value="Submit" />
-      </form>
-      <div id="output"></div> -->
-    </div>
-    <div>
-        <p id='result'></p>
     </div>
 
     <!-- Use a templated HTML printing scriptlet to import JavaScript. -->
